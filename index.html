@@ -1,0 +1,1754 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LoL Esports Hub | 롤 전적 백과사전 & 나무위키 AI 대시보드</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        hextech: {
+                            gold: '#D97706',
+                            goldHover: '#B45309',
+                            goldLight: '#FEF3C7',
+                            blue: '#0284C7',
+                            blueLight: '#E0F2FE',
+                            dark: '#0F172A',
+                            hupuRed: '#DC2626',
+                            hupuBg: '#FEF2F2',
+                            emerald: '#059669',
+                            purple: '#7C3AED'
+                        }
+                    },
+                    fontFamily: {
+                        orbitron: ['Orbitron', 'sans-serif'],
+                        sans: ['Noto Sans KR', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #F8FAFC;
+            background-image: 
+                radial-gradient(circle at 10% 0%, rgba(2, 132, 199, 0.04) 0%, transparent 50%),
+                radial-gradient(circle at 90% 100%, rgba(217, 119, 6, 0.04) 0%, transparent 50%);
+            color: #0F172A;
+            font-family: 'Noto Sans KR', sans-serif;
+            min-height: 100vh;
+        }
+
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #B45309 0%, #D97706 60%, #78350F 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .blue-gradient-text {
+            background: linear-gradient(135deg, #0369A1 0%, #0284C7 60%, #0c4a6e 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .light-card {
+            background: #FFFFFF;
+            border: 1px solid #E2E8F0;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+        }
+        
+        .light-card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #F1F5F9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #CBD5E1;
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94A3B8;
+        }
+
+        .tab-btn.active {
+            color: #0284C7;
+            border-bottom: 3px solid #0284C7;
+            background: #F0F9FF;
+            font-weight: 700;
+        }
+
+        .year-pill.active, .tourney-pill.active {
+            background: #0F172A;
+            color: #FFFFFF;
+            font-weight: 700;
+            box-shadow: 0 2px 4px rgba(15, 23, 42, 0.2);
+        }
+
+        .hupu-badge {
+            background: #DC2626;
+            color: #FFFFFF;
+        }
+
+        /* Namuwiki style Box */
+        .namu-infobox {
+            border: 2px solid #0284C7;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #FFFFFF;
+        }
+        .namu-header {
+            background: #0284C7;
+            color: white;
+            font-weight: 800;
+            padding: 8px 12px;
+            text-align: center;
+        }
+        .namu-row {
+            display: flex;
+            border-bottom: 1px solid #E2E8F0;
+            font-size: 0.8rem;
+        }
+        .namu-label {
+            width: 32%;
+            background: #F1F5F9;
+            padding: 6px 10px;
+            font-weight: 700;
+            color: #334155;
+            border-right: 1px solid #E2E8F0;
+            display: flex;
+            align-items: center;
+        }
+        .namu-val {
+            width: 68%;
+            padding: 6px 10px;
+            color: #0F172A;
+            background: #FFFFFF;
+        }
+    </style>
+</head>
+<body class="custom-scrollbar flex flex-col min-h-screen">
+
+    <!-- Header Navigation -->
+    <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm px-4 lg:px-8 py-3">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+            
+            <!-- Logo & Main Title -->
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 via-hextech-gold to-sky-500 p-[2px] flex items-center justify-center shadow-md">
+                    <div class="w-full h-full bg-slate-900 rounded-[10px] flex items-center justify-center">
+                        <i class="fa-solid fa-trophy text-amber-400 text-lg"></i>
+                    </div>
+                </div>
+                <div>
+                    <h1 class="font-orbitron text-xl sm:text-2xl font-extrabold tracking-wider blue-gradient-text uppercase">
+                        LoL Esports Hub
+                    </h1>
+                    <p class="text-xs text-slate-500 font-medium">전적 백과사전 • 나무위키 검색 • 후푸 평점 & 방송인 해설 요약</p>
+                </div>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="flex items-center gap-3 w-full md:w-auto">
+                <div class="relative flex-1 md:w-80">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                    <input type="text" id="globalSearch" placeholder="선수(Faker, Chovy), 팀(SKT, T1), 챔피언 검색..." 
+                           class="w-full bg-slate-50 border border-slate-300 rounded-lg pl-9 pr-4 py-2 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-hextech-blue focus:bg-white focus:ring-1 focus:ring-hextech-blue transition"
+                           onkeyup="handleSearch()">
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="max-w-7xl mx-auto flex items-center justify-start gap-1 sm:gap-2 mt-3 border-t border-slate-200 pt-2 overflow-x-auto text-xs sm:text-sm font-semibold">
+            <button onclick="switchMainTab('matches')" id="tab-matches" class="tab-btn active px-4 py-2.5 rounded-t-lg transition flex items-center gap-2 shrink-0">
+                <i class="fa-solid fa-gamepad text-hextech-blue"></i> 경기 전적 & AI 요약
+            </button>
+            <button onclick="switchMainTab('wiki')" id="tab-wiki" class="tab-btn px-4 py-2.5 rounded-t-lg text-slate-600 hover:text-slate-900 transition flex items-center gap-2 shrink-0">
+                <i class="fa-solid fa-book-bookmark text-amber-600"></i> 나무위키 백과사전
+            </button>
+            <button onclick="switchMainTab('hupu')" id="tab-hupu" class="tab-btn px-4 py-2.5 rounded-t-lg text-slate-600 hover:text-slate-900 transition flex items-center gap-2 shrink-0">
+                <i class="fa-solid fa-comments text-red-500"></i> 후푸 평점 & 해설 코멘트
+            </button>
+            <button onclick="switchMainTab('champions')" id="tab-champions" class="tab-btn px-4 py-2.5 rounded-t-lg text-slate-600 hover:text-slate-900 transition flex items-center gap-2 shrink-0">
+                <i class="fa-solid fa-shield-halved text-sky-600"></i> 챔피언 밴픽 메타
+            </button>
+            <button onclick="switchMainTab('standings')" id="tab-standings" class="tab-btn px-4 py-2.5 rounded-t-lg text-slate-600 hover:text-slate-900 transition flex items-center gap-2 shrink-0">
+                <i class="fa-solid fa-list-ol text-emerald-600"></i> 리그 순위표
+            </button>
+            <button onclick="switchMainTab('h2h')" id="tab-h2h" class="tab-btn px-4 py-2.5 rounded-t-lg text-slate-600 hover:text-slate-900 transition flex items-center gap-2 shrink-0">
+                <i class="fa-solid fa-swords text-purple-600"></i> 상대 전적 비교
+            </button>
+        </div>
+    </header>
+
+    <!-- Global Filter Bar (Year & Tournament) -->
+    <div class="bg-white border-b border-slate-200 py-2.5 px-4 lg:px-8 shadow-2xs">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-2.5 text-xs">
+            
+            <!-- Year Selector Pills -->
+            <div class="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 w-full md:w-auto">
+                <span class="text-slate-500 font-orbitron text-[11px] mr-1 uppercase font-bold shrink-0">Season:</span>
+                <button onclick="filterYear('ALL')" class="year-pill active px-3 py-1 rounded-full border border-slate-300 text-slate-700 bg-slate-100 transition shrink-0">ALL (전체)</button>
+                <button onclick="filterYear('2026')" class="year-pill px-3 py-1 rounded-full border border-slate-200 bg-slate-100 text-slate-700 transition shrink-0">2026</button>
+                <button onclick="filterYear('2025')" class="year-pill px-3 py-1 rounded-full border border-slate-200 bg-slate-100 text-slate-700 transition shrink-0">2025</button>
+                <button onclick="filterYear('2024')" class="year-pill px-3 py-1 rounded-full border border-slate-200 bg-slate-100 text-slate-700 transition shrink-0">2024</button>
+                <button onclick="filterYear('2023')" class="year-pill px-3 py-1 rounded-full border border-slate-200 bg-slate-100 text-slate-700 transition shrink-0">2023</button>
+            </div>
+
+            <!-- Tournament Filters -->
+            <div class="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 custom-scrollbar w-full md:w-auto">
+                <span class="text-slate-500 font-orbitron text-[11px] mr-1 uppercase font-bold shrink-0">League:</span>
+                <button onclick="filterTournament('ALL')" class="tourney-pill active px-3 py-1 rounded-full border border-slate-300 bg-slate-100 text-slate-700 transition shrink-0">🌐 전체</button>
+                <button onclick="filterTournament('LCK')" class="tourney-pill px-3 py-1 rounded-full border border-slate-200 bg-slate-100 text-slate-700 transition shrink-0">🇰🇷 LCK</button>
+                <button onclick="filterTournament('LPL')" class="tourney-pill px-3 py-1 rounded-full border border-slate-200 bg-slate-100 text-slate-700 transition shrink-0">🇨🇳 LPL</button>
+                <button onclick="filterTournament('MSI')" class="tourney-pill px-3 py-1 rounded-full border border-sky-200 bg-sky-50 text-sky-800 transition shrink-0">👑 MSI</button>
+                <button onclick="filterTournament('EWC')" class="tourney-pill px-3 py-1 rounded-full border border-amber-200 bg-amber-50 text-amber-800 transition shrink-0">⚔️ EWC</button>
+                <button onclick="filterTournament('WORLDS')" class="tourney-pill px-3 py-1 rounded-full border border-purple-200 bg-purple-50 text-purple-800 transition shrink-0">🌌 Worlds</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Layout -->
+    <main class="max-w-7xl mx-auto w-full px-4 lg:px-8 py-6 flex-1">
+
+        <!-- TAB 1: MATCH HISTORY & AI SUMMARY -->
+        <section id="sec-matches" class="space-y-5">
+            <!-- Stage Sub-Filter & Count -->
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs">
+                <div class="flex items-center gap-2 flex-wrap text-xs">
+                    <span class="text-slate-500 font-bold">경기 단계:</span>
+                    <button onclick="filterStage('ALL')" class="stage-btn bg-slate-900 text-white px-3 py-1 rounded-md font-bold">전체 경기</button>
+                    <button onclick="filterStage('QUALIFIER')" class="stage-btn bg-slate-100 text-slate-600 hover:bg-slate-200 px-3 py-1 rounded-md">플레이인 / 선발전</button>
+                    <button onclick="filterStage('SWISS')" class="stage-btn bg-slate-100 text-slate-600 hover:bg-slate-200 px-3 py-1 rounded-md">스위스 / 그룹 스테이지</button>
+                    <button onclick="filterStage('KNOCKOUT')" class="stage-btn bg-slate-100 text-slate-600 hover:bg-slate-200 px-3 py-1 rounded-md">8강 / 4강 토너먼트</button>
+                    <button onclick="filterStage('FINALS')" class="stage-btn bg-slate-100 text-slate-600 hover:bg-slate-200 px-3 py-1 rounded-md">결승전 (Finals)</button>
+                </div>
+                <div class="text-xs text-slate-500">
+                    조회된 경기: <span id="matchCountDisplay" class="text-hextech-blue font-bold font-orbitron">0</span>건
+                </div>
+            </div>
+
+            <!-- Matches List Grid -->
+            <div id="matchesContainer" class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                <!-- Dynamically Rendered Match Cards -->
+            </div>
+        </section>
+
+        <!-- TAB 2: NAMUWIKI SEARCH ENCYCLOPEDIA -->
+        <section id="sec-wiki" class="hidden space-y-6">
+            <div class="light-card rounded-xl p-6">
+                <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-200">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+                            <i class="fa-solid fa-book-bookmark text-amber-600"></i> 나무위키형 프로팀 & 레전드 선수 백과사전
+                        </h2>
+                        <p class="text-xs text-slate-500 mt-1">역대 전설적인 프로팀과 대표 선수들의 수상 이력, 통산 승률 및 유명 방송인 평가를 조회합니다.</p>
+                    </div>
+
+                    <!-- Category Switcher Pills -->
+                    <div class="flex items-center gap-2 bg-slate-100 p-1 rounded-lg border border-slate-200 text-xs">
+                        <button onclick="switchWikiCategory('PLAYERS')" id="wikiCatPlayers" class="px-4 py-1.5 rounded-md font-bold bg-white text-hextech-blue shadow-2xs">👤 레전드 선수 (Player)</button>
+                        <button onclick="switchWikiCategory('TEAMS')" id="wikiCatTeams" class="px-4 py-1.5 rounded-md text-slate-600 font-medium">🛡️ 역대 명문 팀 (Teams)</button>
+                    </div>
+                </div>
+
+                <!-- Wiki Search & Quick Selector Bar -->
+                <div class="space-y-4 mb-6">
+                    <div class="relative">
+                        <i class="fa-solid fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                        <input type="text" id="wikiSearchInput" placeholder="선수명(Faker, Chovy, Deft, Canyon) 또는 팀명(SKT T1, ROX, T1, Gen.G) 검색..." 
+                               class="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-4 py-2.5 text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-hextech-blue focus:bg-white transition"
+                               onkeyup="filterWikiList()">
+                    </div>
+
+                    <!-- Quick Click Pills -->
+                    <div id="wikiQuickPills" class="flex items-center gap-1.5 overflow-x-auto pb-2 custom-scrollbar text-xs">
+                        <!-- JS populated pills -->
+                    </div>
+                </div>
+
+                <!-- Wiki Infobox Display Container -->
+                <div id="wikiDisplayCard" class="space-y-6">
+                    <!-- Dynamic Namuwiki Infobox Rendered Here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: HUPU RATINGS & STREAMER REVIEWS -->
+        <section id="sec-hupu" class="hidden space-y-6">
+            <div class="light-card rounded-xl p-6">
+                <h2 class="text-lg font-bold text-slate-900 mb-1 flex items-center gap-2">
+                    <i class="fa-solid fa-comments text-red-500"></i> 후푸(Hupu) 평점 및 명 해설·방송인 인용 모음
+                </h2>
+                <p class="text-xs text-slate-500 mb-6">중국 최대 롤 커뮤니티 후푸의 10점 만점 평가와 도파, 이상호, 클템, 전용준 등 주요 해설진의 분석 인용구입니다.</p>
+
+                <div id="hupuFeedContainer" class="space-y-4">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: CHAMPION META STATS -->
+        <section id="sec-champions" class="hidden space-y-6">
+            <div class="light-card rounded-xl p-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-5 border-b border-slate-200 pb-4">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                            <i class="fa-solid fa-shield-halved text-sky-600"></i> 대회 메타 챔피언 밴픽 통계 (2023-2026)
+                        </h2>
+                        <p class="text-xs text-slate-500">대회 등장 횟수, 밴픽 픽률, 승률 및 대표 시그니처 프로 선수 현황</p>
+                    </div>
+
+                    <!-- Champion Role Filter -->
+                    <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200 text-xs">
+                        <button onclick="filterChampRole('ALL')" class="champ-role-btn px-3 py-1 rounded bg-slate-900 text-white font-bold">전체</button>
+                        <button onclick="filterChampRole('TOP')" class="champ-role-btn px-3 py-1 rounded text-slate-700">TOP</button>
+                        <button onclick="filterChampRole('JUG')" class="champ-role-btn px-3 py-1 rounded text-slate-700">JUG</button>
+                        <button onclick="filterChampRole('MID')" class="champ-role-btn px-3 py-1 rounded text-slate-700">MID</button>
+                        <button onclick="filterChampRole('BOT')" class="champ-role-btn px-3 py-1 rounded text-slate-700">BOT</button>
+                        <button onclick="filterChampRole('SUP')" class="champ-role-btn px-3 py-1 rounded text-slate-700">SUP</button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="championsGrid">
+                    <!-- Dynamic Champion Cards -->
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 5: LEAGUE STANDINGS -->
+        <section id="sec-standings" class="hidden space-y-6">
+            <div class="light-card rounded-xl p-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-5">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                            <i class="fa-solid fa-list-ol text-emerald-600"></i> <span id="standingsTitle">공식 리그 순위표</span>
+                        </h2>
+                        <p class="text-xs text-slate-500">선택된 연도 및 리그의 팀 순위, 매치 승률, 세트 득실차 현황</p>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-600 font-orbitron border-b border-slate-200 text-[11px] uppercase tracking-wider">
+                                <th class="py-3 px-4 text-center">순위</th>
+                                <th class="py-3 px-4">팀명</th>
+                                <th class="py-3 px-4 text-center">지역</th>
+                                <th class="py-3 px-4 text-center">매치 (승-패)</th>
+                                <th class="py-3 px-4 text-center">승률 %</th>
+                                <th class="py-3 px-4 text-center">세트 (득실차)</th>
+                                <th class="py-3 px-4 text-center">최근 연승</th>
+                            </tr>
+                        </thead>
+                        <tbody id="standingsTableBody" class="divide-y divide-slate-100 font-medium">
+                            <!-- Dynamic Standings Rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 6: HEAD TO HEAD (H2H) VISUALIZER -->
+        <section id="sec-h2h" class="hidden space-y-6">
+            <div class="light-card rounded-xl p-6">
+                <h2 class="text-lg font-bold text-slate-900 mb-1 flex items-center gap-2">
+                    <i class="fa-solid fa-swords text-purple-600"></i> 라이벌 상대 전적 비교 분석
+                </h2>
+                <p class="text-xs text-slate-500 mb-6">두 프로팀 간의 2023 ~ 2026 통산 상대 전적 및 역대 맞대결 결과를 비교합니다.</p>
+
+                <!-- Selector Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-center bg-slate-50 p-4 rounded-xl border border-slate-200 mb-6">
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-bold text-hextech-blue mb-1">팀 A 선택</label>
+                        <select id="h2hTeamA" onchange="updateH2HView()" class="w-full bg-white border border-slate-300 rounded-lg p-2.5 text-xs sm:text-sm text-slate-900 font-bold focus:outline-none focus:border-hextech-blue">
+                        </select>
+                    </div>
+
+                    <div class="text-center font-orbitron text-2xl font-black text-amber-600 italic">
+                        VS
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-bold text-red-600 mb-1">팀 B 선택</label>
+                        <select id="h2hTeamB" onchange="updateH2HView()" class="w-full bg-white border border-slate-300 rounded-lg p-2.5 text-xs sm:text-sm text-slate-900 font-bold focus:outline-none focus:border-red-500">
+                        </select>
+                    </div>
+                </div>
+
+                <div id="h2hResultCard" class="space-y-6">
+                    <!-- Dynamic H2H Content -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- SCOREBOARD & DRAFT MODAL -->
+    <div id="matchModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 hidden">
+        <div class="bg-white border border-slate-300 rounded-2xl w-full max-w-4xl max-h-[92vh] flex flex-col overflow-hidden shadow-2xl">
+            
+            <!-- Modal Header -->
+            <div class="bg-slate-900 text-white p-4 flex justify-between items-center">
+                <div class="flex items-center gap-2 text-xs font-orbitron uppercase font-bold text-amber-400">
+                    <i class="fa-solid fa-trophy"></i>
+                    <span id="modalTourneyName">WORLDS</span> - <span id="modalStageName">FINALS</span>
+                </div>
+                <button onclick="closeMatchModal()" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Modal Content Body -->
+            <div class="p-4 sm:p-6 overflow-y-auto space-y-6 custom-scrollbar text-xs sm:text-sm">
+                
+                <!-- Match Score Banner -->
+                <div class="bg-slate-50 rounded-xl p-4 sm:p-5 border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div class="flex items-center gap-3 w-full sm:w-2/5 justify-start">
+                        <img id="modalTeam1Logo" src="" class="w-12 h-12 object-contain bg-white p-1 rounded-lg border border-slate-200 shadow-2xs">
+                        <div>
+                            <div id="modalTeam1Name" class="font-black text-lg text-slate-900">T1</div>
+                            <div id="modalTeam1Region" class="text-xs text-sky-600 font-bold">LCK</div>
+                        </div>
+                    </div>
+
+                    <div class="text-center font-orbitron px-4 py-2 bg-white rounded-lg border border-amber-500/40 shadow-2xs shrink-0">
+                        <div id="modalMatchScore" class="text-2xl sm:text-3xl font-black text-amber-600">3 : 2</div>
+                        <div id="modalMatchDate" class="text-[10px] text-slate-400">2024.11.02</div>
+                    </div>
+
+                    <div class="flex items-center gap-3 w-full sm:w-2/5 justify-end text-right">
+                        <div>
+                            <div id="modalTeam2Name" class="font-black text-lg text-slate-900">BLG</div>
+                            <div id="modalTeam2Region" class="text-xs text-red-600 font-bold">LPL</div>
+                        </div>
+                        <img id="modalTeam2Logo" src="" class="w-12 h-12 object-contain bg-white p-1 rounded-lg border border-slate-200 shadow-2xs">
+                    </div>
+                </div>
+
+                <!-- Caster Summary & Streamer Commentary Quote Box -->
+                <div class="bg-amber-50/60 p-4 rounded-xl border border-amber-200 space-y-3">
+                    <div class="flex items-start gap-3">
+                        <div class="w-7 h-7 rounded-full bg-amber-500 text-white flex items-center justify-center shrink-0 mt-0.5">
+                            <i class="fa-solid fa-microphone"></i>
+                        </div>
+                        <div>
+                            <span class="text-xs font-bold text-amber-800">공식 해설진 중계 총평 (전용준 / 클템 / 성승헌):</span>
+                            <p id="modalCasterQuote" class="text-xs text-slate-800 mt-0.5 leading-relaxed font-medium">"역대급 5세트 접전 속에서 페이커의 침착함이 우승을 이끌었습니다!"</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3 border-t border-amber-200/80 pt-2.5">
+                        <div class="w-7 h-7 rounded-full bg-sky-500 text-white flex items-center justify-center shrink-0 mt-0.5">
+                            <i class="fa-solid fa-headset"></i>
+                        </div>
+                        <div>
+                            <span class="text-xs font-bold text-sky-800">유명 방송인/프로 평가 (도파 / 이상호 / 김민교):</span>
+                            <p id="modalStreamerQuote" class="text-xs text-sky-900 italic mt-0.5 font-medium">"도파: 4세트 사일러스 텔포 타이밍 하나가 경기 전체 라인 흐름을 갈랐습니다."</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Set Tabs -->
+                <div id="gameSetTabs" class="flex items-center gap-2 border-b border-slate-200 pb-2">
+                    <!-- Dynamic Game Set Tabs -->
+                </div>
+
+                <!-- Game Detail Scoreboard Table -->
+                <div id="gameDetailContent" class="space-y-4">
+                    <!-- Populated by JS -->
+                </div>
+
+            </div>
+            
+            <div class="bg-slate-100 p-3 border-t border-slate-200 text-center text-xs text-slate-500">
+                LoL Esports Official Record • Hupu Rating Database
+            </div>
+        </div>
+    </div>
+
+    <!-- AI MATCH SUMMARY MODAL -->
+    <div id="aiSummaryModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 hidden">
+        <div class="bg-white border border-sky-500/30 rounded-2xl w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl">
+            
+            <!-- Modal Header -->
+            <div class="bg-gradient-to-r from-sky-700 via-sky-600 to-indigo-700 text-white p-4 flex justify-between items-center">
+                <div class="flex items-center gap-2 text-sm font-bold">
+                    <i class="fa-solid fa-robot text-amber-300 text-lg"></i>
+                    <span>Namuwiki AI 경기 핵심 한타 & 승부처 분석 리포트</span>
+                </div>
+                <button onclick="closeAiSummaryModal()" class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- AI Summary Content -->
+            <div class="p-5 overflow-y-auto space-y-5 custom-scrollbar text-xs sm:text-sm">
+                <div id="aiSummaryTitleBox" class="bg-sky-50 p-4 rounded-xl border border-sky-200">
+                    <h4 id="aiSummaryMatchHeader" class="font-bold text-slate-900 text-base">Match Title</h4>
+                    <p id="aiSummarySubText" class="text-xs text-sky-800 mt-1">AI 분석 엔진이 추출한 주요 한타 타이밍 및 골드 리드 변곡점 분석입니다.</p>
+                </div>
+
+                <!-- Timeline / Key Turning Points -->
+                <div class="space-y-3">
+                    <h5 class="font-bold text-slate-800 flex items-center gap-2 text-xs uppercase tracking-wide">
+                        <i class="fa-solid fa-timeline text-amber-600"></i> 경기 승부처 3대 핵심 타임라인 (Key Milestones)
+                    </h5>
+                    <div id="aiTimelineItems" class="space-y-2.5">
+                        <!-- Dynamic AI Timeline -->
+                    </div>
+                </div>
+
+                <!-- Gold Lead Curve Visual Simulator -->
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+                    <h5 class="font-bold text-slate-800 text-xs flex items-center gap-2">
+                        <i class="fa-solid fa-chart-line text-emerald-600"></i> 골드 격차 변화 (Gold Difference Flow)
+                    </h5>
+                    <div class="w-full bg-slate-200 h-6 rounded-lg overflow-hidden flex items-center px-2 text-[10px] font-bold text-slate-700 justify-between">
+                        <span id="aiGoldLeadLeft">Team A +3.5k</span>
+                        <span class="text-slate-400">| 25min Baron Fight |</span>
+                        <span id="aiGoldLeadRight">Team B</span>
+                    </div>
+                </div>
+
+                <!-- Streamer Dopa & Lee Sang-ho Commentary Deep-Dive -->
+                <div class="bg-slate-900 text-white p-4 rounded-xl space-y-3">
+                    <div class="flex items-center gap-2 text-xs font-bold text-amber-400">
+                        <i class="fa-solid fa-brain"></i> 유명 방송인 롤 전문가 2인 심층 총평
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                        <div class="bg-slate-800 p-3 rounded-lg border border-slate-700">
+                            <span class="text-sky-300 font-bold block mb-1">🎮 도파 (Dopa)의 라인전 & 운영 분석:</span>
+                            <p id="aiDopaAnalysis" class="text-slate-300 leading-relaxed text-[11px]">"미드 주도권을 바탕으로 한 사이드 시야 장악이 승리 핵심이었습니다."</p>
+                        </div>
+                        <div class="bg-slate-800 p-3 rounded-lg border border-slate-700">
+                            <span class="text-amber-300 font-bold block mb-1">🔥 이상호의 한타 & 리액션 총평:</span>
+                            <p id="aiSanghoAnalysis" class="text-slate-300 leading-relaxed text-[11px]">"마지막 바론 앞 5대5 한타는 롤 역사에 남을 명장면이었습니다!"</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-slate-100 p-3 border-t border-slate-200 text-right">
+                <button onclick="closeAiSummaryModal()" class="bg-slate-900 text-white px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-slate-800 transition">
+                    확인 및 닫기
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-200 bg-white py-4 px-4 text-center text-xs text-slate-500 mt-auto">
+        <p>© 2023-2026 LoL Esports Hub. LCK • LPL • LEC • MSI • EWC • Worlds Database & Namuwiki Search Engine.</p>
+    </footer>
+
+    <!-- JAVASCRIPT CORE LOGIC -->
+    <script>
+        // ==========================================
+        // 1. DATA STORES (TEAMS, PLAYERS, WIKI, MATCHES, CHAMPIONS)
+        // ==========================================
+
+        const TEAMS = {
+            "T1": { name: "T1", region: "LCK", logo: "https://placehold.co/100x100/0f172a/ffffff?text=T1", winRate: "73.2%", totalMatches: 260, titles: "Worlds 2023, Worlds 2024, EWC 2024", streak: "3연승" },
+            "GEN": { name: "Gen.G", region: "LCK", logo: "https://placehold.co/100x100/0f172a/d97706?text=GEN", winRate: "79.1%", totalMatches: 240, titles: "MSI 2024, LCK 2023/2024/2025/2026", streak: "5연승" },
+            "HLE": { name: "Hanwha Life", region: "LCK", logo: "https://placehold.co/100x100/0f172a/ea580c?text=HLE", winRate: "69.5%", totalMatches: 205, titles: "LCK 2024 Summer Champions", streak: "1패" },
+            "DK": { name: "Dplus KIA", region: "LCK", logo: "https://placehold.co/100x100/0f172a/0284c7?text=DK", winRate: "64.2%", totalMatches: 210, titles: "Worlds 2020 우승 (구 담원)", streak: "2연승" },
+            "KT": { name: "KT Rolster", region: "LCK", logo: "https://placehold.co/100x100/0f172a/dc2626?text=KT", winRate: "61.0%", totalMatches: 200, titles: "LCK 2018 Summer 우승", streak: "1승" },
+            "BLG": { name: "Bilibili Gaming", region: "LPL", logo: "https://placehold.co/100x100/0f192c/0284c7?text=BLG", winRate: "75.4%", totalMatches: 230, titles: "LPL 2024/2025 Champions", streak: "8연승" },
+            "TES": { name: "Top Esports", region: "LPL", logo: "https://placehold.co/100x100/0f192c/dc2626?text=TES", winRate: "68.0%", totalMatches: 195, titles: "EWC 2024 준우승", streak: "2연승" },
+            "JDG": { name: "JD Gaming", region: "LPL", logo: "https://placehold.co/100x100/0f192c/d97706?text=JDG", winRate: "74.0%", totalMatches: 215, titles: "MSI 2023 우승, LPL 3회 우승", streak: "1승" },
+            "WBG": { name: "Weibo Gaming", region: "LPL", logo: "https://placehold.co/100x100/0f192c/d97706?text=WBG", winRate: "61.8%", totalMatches: 180, titles: "Worlds 2023 준우승", streak: "1패" },
+            "SKT_2013": { name: "SKT T1 K (2013)", region: "LCK (Legend)", logo: "https://placehold.co/100x100/0f172a/b45309?text=SKT13", winRate: "89.2%", totalMatches: 50, titles: "Worlds 2013 우승, OGN 전승 우승", streak: "완결" },
+            "SSW_2014": { name: "Samsung White (2014)", region: "LCK (Legend)", logo: "https://placehold.co/100x100/0f172a/0284c7?text=SSW", winRate: "90.0%", totalMatches: 45, titles: "Worlds 2014 압도적 우승", streak: "완결" },
+            "SKT_2015": { name: "SKT T1 (2015)", region: "LCK (Legend)", logo: "https://placehold.co/100x100/0f172a/b45309?text=SKT15", winRate: "91.5%", totalMatches: 65, titles: "Worlds 2015 우승 (15승 1패 레전드)", streak: "완결" },
+            "ROX_2016": { name: "ROX Tigers (2016)", region: "LCK (Legend)", logo: "https://placehold.co/100x100/0f172a/10b981?text=ROX", winRate: "82.4%", totalMatches: 70, titles: "LCK 2016 Summer 우승", streak: "완결" },
+            "DWG_2020": { name: "DAMWON Gaming (2020)", region: "LCK (Legend)", logo: "https://placehold.co/100x100/0f172a/0284c7?text=DWG", winRate: "88.6%", totalMatches: 60, titles: "Worlds 2020 우승", streak: "완결" },
+            "DRX_2022": { name: "DRX (2022)", region: "LCK (Legend)", logo: "https://placehold.co/100x100/0f172a/2563eb?text=DRX", winRate: "65.0%", totalMatches: 75, titles: "Worlds 2022 기적의 우승", streak: "완결" }
+        };
+
+        // CHAMPION META STATISTICS DATABASE
+        const CHAMPIONS_DATA = [
+            { name: "아지르 (Azir)", role: "MID", presence: "92.4%", winRate: "54.2%", pickCount: 142, banCount: 180, signature: "Faker, Chovy, Bdd" },
+            { name: "오리아나 (Orianna)", role: "MID", presence: "88.1%", winRate: "52.8%", pickCount: 130, banCount: 165, signature: "Faker, Rookie, ShowMaker" },
+            { name: "요네 (Yone)", role: "MID", presence: "85.6%", winRate: "56.0%", pickCount: 110, banCount: 190, signature: "Chovy, Zeus, Zeka" },
+            { name: "크산테 (K'Sante)", role: "TOP", presence: "94.0%", winRate: "53.5%", pickCount: 160, banCount: 200, signature: "Kiin, Zeus, Bin" },
+            { name: "럼블 (Rumble)", role: "TOP", presence: "82.0%", winRate: "55.1%", pickCount: 95, banCount: 175, signature: "Doran, Kingen, Kiin" },
+            { name: "칼리스타 (Kalista)", role: "BOT", presence: "90.2%", winRate: "51.9%", pickCount: 115, banCount: 210, signature: "Gumayusi, Ruler, Viper" },
+            { name: "바루스 (Varus)", role: "BOT", presence: "86.4%", winRate: "53.0%", pickCount: 140, banCount: 155, signature: "Gumayusi, Deft, JackeyLove" },
+            { name: "바이 (Vi)", role: "JUG", presence: "89.0%", winRate: "57.2%", pickCount: 150, banCount: 170, signature: "Oner, Canyon, Xun" },
+            { name: "리 신 (Lee Sin)", role: "JUG", presence: "78.5%", winRate: "50.4%", pickCount: 135, banCount: 120, signature: "Oner, Peanut, Canyon" },
+            { name: "라칸 (Rakan)", role: "SUP", presence: "84.3%", winRate: "55.8%", pickCount: 125, banCount: 160, signature: "Keria, Crisp, Delight" },
+            { name: "노틸러스 (Nautilus)", role: "SUP", presence: "81.0%", winRate: "49.5%", pickCount: 155, banCount: 110, signature: "Keria, ON, Missing" }
+        ];
+
+        // NAMUWIKI ENCYCLOPEDIA DATABASE (PLAYERS & TEAMS)
+        const WIKI_DATABASE = {
+            players: [
+                {
+                    id: "faker",
+                    name: "Faker (이상혁)",
+                    team: "T1",
+                    pos: "MID",
+                    active: "2013 ~ 현재",
+                    birth: "1996년 5월 7일",
+                    trophies: "Worlds 5회 우승 (2013, 2015, 2016, 2023, 2024), MSI 2회, LCK 10회 우승",
+                    winRate: "73.8% (통산 1,000+ 경기)",
+                    signature: "아지르, 오리아나, 사일러스, 르블랑, 갈리오",
+                    streamerReviews: [
+                        { name: "도파 (Dopa)", quote: "페이커는 롤 그 자체다. 라인전에서 상대 쿨타임을 계산하는 차원이 다르며, 결승 5세트에서의 결단력은 전 세계에 오직 한 명뿐이다." },
+                        { name: "이상호", quote: "아니 사일러스 텔포 타이밍이랑 갈리오 한타 토스 봤습니까? 왜 대상혁 대상혁 하는지 이 경기 하나로 증명됩니다!" },
+                        { name: "클템 (이현우)", quote: "스카너가 당겼어요!! 대상혁!! 롤드컵 통산 5번째 우승!! 영원한 왕좌의 주인 페이커!!" }
+                    ],
+                    summary: "League of Legends 역사상 가장 위대한 GOAT 프로게이머. 10년이 넘는 세월 동안 최정상의 자리를 지키며 T1을 상징하는 불멸의 전설."
+                },
+                {
+                    id: "chovy",
+                    name: "Chovy (정지훈)",
+                    team: "Gen.G",
+                    pos: "MID",
+                    active: "2018 ~ 현재",
+                    birth: "2001년 3월 3일",
+                    trophies: "MSI 2024 우승, LCK 5회 우승",
+                    winRate: "76.5%",
+                    signature: "요네, 코르키, 아지르, 아칼리, 아리",
+                    streamerReviews: [
+                        { name: "도파 (Dopa)", quote: "쵸비의 라인전과 CS 수급 능력은 기계 수준이다. 미드 라인 디테일에 있어서 정답지를 작성하는 선수." },
+                        { name: "이상호", quote: "아니 쵸비 CS 보셨어요? 상대 미드보다 50개 더 먹고 한타 때 딜 쏟아붓는데 막을 수가 없네요!" },
+                        { name: "전용준 캐스터", quote: "무결점의 미드라이너 정지훈! 마침내 세계 무대 MSI 정상에 오릅니다!" }
+                    ],
+                    summary: "압도적인 체급과 라인전 수행 능력, 완벽한 CS 스노우볼링을 자랑하는 세계 최고 미드라이너 중 한 명."
+                },
+                {
+                    id: "deft",
+                    name: "Deft (김혁규)",
+                    team: "전 DRX / KT (레전드)",
+                    pos: "BOT",
+                    active: "2013 ~ 2024",
+                    birth: "1996년 10월 23일",
+                    trophies: "Worlds 2022 우승, MSI 2015 우승, LCK 2회 우승, LPL 2회 우승",
+                    winRate: "68.2%",
+                    signature: "징크스, 케이틀린, 이즈리얼, 바루스",
+                    streamerReviews: [
+                        { name: "이상호", quote: "중요한 것은 꺾이지 않는 마음! 데프트 선수의 2022 롤드컵 라스트 댄스는 롤 역사상 최고의 드라마였습니다." },
+                        { name: "클템 (이현우)", quote: "꺾이지 않는 마음의 원조! 데프트의 10년 도전이 드디어 결실을 맺습니다!" }
+                    ],
+                    summary: "'중꺾마(중요한 것은 꺾이지 않는 마음)' 서사의 주인공. 10년 넘는 끊임없는 도전 끝에 롤드컵 우승을 차지한 원딜의 전설."
+                },
+                {
+                    id: "showmaker",
+                    name: "ShowMaker (허수)",
+                    team: "Dplus KIA",
+                    pos: "MID",
+                    active: "2017 ~ 현재",
+                    birth: "2000년 7월 22일",
+                    trophies: "Worlds 2020 우승, LCK 3회 우승",
+                    winRate: "70.4%",
+                    signature: "신드라, 카타리나, 조이, 사일러스",
+                    streamerReviews: [
+                        { name: "도파 (Dopa)", quote: "쇼메이커는 챔피언 폭이 넓고 유연하다. 팀이 요구하는 역할을 100% 수행하는 판타지스타." },
+                        { name: "성승헌 캐스터", quote: "쇼메이커의 미드 조이가 협곡 전체를 지휘하고 있습니다!" }
+                    ],
+                    summary: "담원 기아의 르네상스를 이끈 2020 롤드컵 챔피언. 뛰어난 피지컬과 스타성을 겸비한 롤판의 아이콘."
+                },
+                {
+                    id: "canyon",
+                    name: "Canyon (김건부)",
+                    team: "Gen.G",
+                    pos: "JUG",
+                    active: "2018 ~ 현재",
+                    birth: "2001년 6월 18일",
+                    trophies: "Worlds 2020 우승 (Finals MVP), MSI 2024, LCK 4회 우승",
+                    winRate: "73.5%",
+                    signature: "니달리, 리 신, 그레이브즈, 세주아니",
+                    streamerReviews: [
+                        { name: "도파 (Dopa)", quote: "캐니언의 정글 동선 설계와 니달리 숙련도는 롤 동선 이론의 정점이다." }
+                    ],
+                    summary: "2020 롤드컵 결승 MVP 출신. 정글 동선 설계 및 한타 캐리력이 독보적인 세계 최고의 정글러."
+                },
+                {
+                    id: "zeus",
+                    name: "Zeus (최우제)",
+                    team: "Hanwha Life",
+                    pos: "TOP",
+                    active: "2021 ~ 현재",
+                    birth: "2004년 1월 31일",
+                    trophies: "Worlds 2023 Finals MVP, Worlds 2024 우승, LCK 우승",
+                    winRate: "73.0%",
+                    signature: "제이스, 요네, 아트록스, 크산테",
+                    streamerReviews: [
+                        { name: "도파 (Dopa)", quote: "제우스의 탑 아트록스, 요네는 공격성 측면에서 탑의 정점이다. 칼 대 칼 싸움에서 지지 않는다." },
+                        { name: "클템 (이현우)", quote: "신의 하강! 제우스 최우제! 탑을 완벽하게 부숴버립니다!" }
+                    ],
+                    summary: "2023 롤드컵 결승전 MVP. 무시무시한 무력과 칼챔 캐리력을 보유한 세계 최고의 탑라이너."
+                }
+            ],
+            teams: [
+                {
+                    id: "t1_team",
+                    name: "T1 (SK Telecom T1)",
+                    region: "LCK (한국)",
+                    active: "2012 ~ 현재",
+                    trophies: "Worlds 5회 우승 (2013, 2015, 2016, 2023, 2024), MSI 2회, LCK 10회",
+                    winRate: "72.5%",
+                    keyMembers: "Faker, Oner, Gumayusi, Keria, Zeus/Doran",
+                    streamerReviews: [
+                        { name: "전용준 캐스터", quote: "세계 이스포츠 역사상 가장 위대한 명문 구단, T1입니다!!" },
+                        { name: "이상호", quote: "국제대회 롤드컵만 가면 T1 DNA가 발동해서 중국 팀 다 부수는 게 진짜 소름입니다." }
+                    ],
+                    summary: "LoL e스포츠 역사상 가장 많은 우승컵과 전 세계 팬덤을 보유한 명실상부 세계 최고의 명문 구단."
+                },
+                {
+                    id: "skt_2015_team",
+                    name: "SKT T1 (2015 시즌)",
+                    region: "LCK (전설)",
+                    active: "2015 시즌",
+                    trophies: "Worlds 2015 우승 (15승 1패 93.8% 승률), LCK 스프링/서머 우승",
+                    winRate: "91.5%",
+                    keyMembers: "MaRin, Bengi, Faker, Easyhoon, Bang, Wolf",
+                    streamerReviews: [
+                        { name: "도파 (Dopa)", quote: "2015 SKT T1은 롤 역사상 압도적 체급 1위다. 마린의 사이드 운영과 벤기의 협곡 통제가 완벽했다." }
+                    ],
+                    summary: "롤드컵 역사상 단 1세트만 패배하고 우승컵을 들어 올린, 압도적 무적 함대 시즌."
+                },
+                {
+                    id: "geng_team",
+                    name: "Gen.G (젠지)",
+                    region: "LCK (한국)",
+                    active: "2018 ~ 현재 (구 삼성 갤럭시아)",
+                    trophies: "MSI 2024 우승, LCK 5회 우승 (LCK Four-peat 달성)",
+                    winRate: "78.0%",
+                    keyMembers: "Chovy, Canyon, Kiin, Ruler, Duro",
+                    streamerReviews: [
+                        { name: "클템 (이현우)", quote: "리그에서의 젠지는 압도적인 단단함 그 자체입니다. 한타와 운영에 빈틈이 없어요." }
+                    ],
+                    summary: "LCK 최초 4연속 우승(포핏)을 달성한 국내 리그 최고의 강호이자 MSI 챔피언."
+                }
+            ]
+        };
+
+        // ==========================================
+        // 2023 ~ 2026 COMPLETE MATCH DATABASE GENERATOR & CATALOG
+        // ==========================================
+        const CORE_MATCHES = [
+            // ---------------- 2023 SEASON ----------------
+            {
+                id: "m_2023_lck_spr_w1_1", year: "2023", tournament: "LCK", stage: "REGULAR",
+                stageName: "2023 LCK 스프링 개막전 1주차 (T1 vs GEN)", date: "2023.01.18",
+                team1: "T1", team2: "GEN", score1: 2, score2: 0, winner: "T1", mvp: "Faker (Mid)",
+                hupuMvp: "9.7 / 10", hupuComment: "🔥 2023 LCK 스프링 개막전을 지배하는 페이커의 미드 리산드라 완벽 이니시!",
+                casterQuote: "전용준: '2023 LCK 스프링 개막전! 라이벌 T1과 젠지의 불꽃 튀는 대결이 시작됩니다!'",
+                streamerQuote: "도파: 'T1 바텀 듀오의 초반 주도권 설계가 젠지의 정글 동선을 완전히 봉쇄했습니다.'",
+                aiSummary: { timeline: [{ time: "15분 20초", title: "전령 둥지 한타", desc: "Faker 리산드라 궁극기로 Chovy 고립 후 제압" }], dopaAnalysis: "T1 미드 바텀 듀오의 초반 주도권이 압도적이었습니다.", sanghoAnalysis: "개막전부터 T1 폼 미쳤네요!" },
+                games: []
+            },
+            {
+                id: "m_2023_lck_spr_fin", year: "2023", tournament: "LCK", stage: "FINALS",
+                stageName: "2023 LCK 스프링 결승전 (GEN vs T1)", date: "2023.04.09",
+                team1: "GEN", team2: "T1", score1: 3, score2: 1, winner: "GEN", mvp: "Peyz (Bot)",
+                hupuMvp: "9.8 / 10", hupuComment: "👑 신인 원딜 페이즈의 징크스 펜타킬급 하드캐리! 젠지 스프링 우승 달성!",
+                casterQuote: "클템: '페이즈 김수환! 결승전 무대에서 징크스로 협곡을 폭격합니다!'",
+                streamerQuote: "이상호: '아니 신인 원딜이 LCK 결승전에서 이런 배짱 캐리를 한다고?'",
+                aiSummary: { timeline: [{ time: "28분 40초", title: "바론 한타 딜링 폭발", desc: "Peyz 징크스 패시브 발동 후 T1 4인 전멸" }], dopaAnalysis: "젠지 서폿 딜라이트의 라칸 이니시가 매 세트 결정적이었습니다.", sanghoAnalysis: "페이즈 진짜 대물 신인이네요!" },
+                games: []
+            },
+            {
+                id: "m_2023_msi_fin", year: "2023", tournament: "MSI", stage: "FINALS",
+                stageName: "2023 MSI 결승전 (런던 / JDG vs BLG)", date: "2023.05.21",
+                team1: "JDG", team2: "BLG", score1: 3, score2: 1, winner: "JDG", mvp: "Ruler (Bot)",
+                hupuMvp: "9.9 / 10", hupuComment: "🏆 징동의 골든로드 도전! 룰러 징크스-징동 특공대 런던 MSI 우승!",
+                casterQuote: "성승헌: 'Ruler 박재혁! LPL 이적 첫해 MSI 정상에 오릅니다!'",
+                streamerQuote: "도파: '룰러의 위치 선정과 카이팅은 현재 전 세계 원딜 중 독보적 1위입니다.'",
+                aiSummary: { timeline: [{ time: "22분 10초", title: "용 앞 5v5 한타", desc: "Ruler 징크스 한타 프리딜로 트리플킬" }], dopaAnalysis: "JDG의 5대5 한타 집합 속도가 BLG보다 한 수 위였습니다.", sanghoAnalysis: "룰러 엔딩은 진짜 진리네요." },
+                games: []
+            },
+            {
+                id: "m_2023_lck_sum_fin", year: "2023", tournament: "LCK", stage: "FINALS",
+                stageName: "2023 LCK 서머 결승전 (GEN vs T1)", date: "2023.08.20",
+                team1: "GEN", team2: "T1", score1: 3, score2: 0, winner: "GEN", mvp: "Chovy (Mid)",
+                hupuMvp: "9.8 / 10", hupuComment: "👑 젠지 LCK 쓰리핏(3연속 우승) 달성! 쵸비 미드 요네-탈리야 완벽 지배!",
+                casterQuote: "전용준: '젠지 e스포츠! LCK 3연속 우승 쓰리핏 달성!'",
+                streamerQuote: "김민교: '젠지가 LCK 내에서는 진짜 T1 상대로 천적 수준으로 잘하네요.'",
+                aiSummary: { timeline: [{ time: "19분 30초", title: "미드 1차 다이브", desc: "Chovy 요네 궁극기 2인 적중 후 포탑 파괴" }], dopaAnalysis: "쵸비의 라인 주도권이 미드-정글 상성을 완전히 무너뜨렸습니다.", sanghoAnalysis: "젠지 3연우승 미쳤다!" },
+                games: []
+            },
+            {
+                id: "m_2023_w_swiss_r1", year: "2023", tournament: "WORLDS", stage: "SWISS",
+                stageName: "2023 월드 챔피언십 스위스 1라운드 (T1 vs TL)", date: "2023.10.19",
+                team1: "T1", team2: "DK", score1: 1, score2: 0, winner: "T1", mvp: "Faker (Mid)",
+                hupuMvp: "9.5 / 10", hupuComment: "⚡ 롤드컵 스위스 스테이지 T1 오리아나 한타 대승으로 상쾌한 첫 승!",
+                casterQuote: "클템: 'T1이 롤드컵 첫 경기부터 기분 좋은 승리를 거둡니다!'",
+                streamerQuote: "도파: '오리아나 충격파 한 방으로 경기 흐름이 끝났습니다.'",
+                aiSummary: { timeline: [{ time: "24분 00초", title: "바론 한타 오리아나 궁", desc: "Faker 오리아나 3인 충격파 적중" }], dopaAnalysis: "스위스 스테이지 단판전 특유의 집중력이 돋보였습니다.", sanghoAnalysis: "T1 롤드컵 모드 온!" },
+                games: []
+            },
+            {
+                id: "m_2023_w_qf_t1_lng", year: "2023", tournament: "WORLDS", stage: "KNOCKOUT",
+                stageName: "2023 월드 챔피언십 8강 (T1 vs LNG)", date: "2023.11.05",
+                team1: "T1", team2: "BLG", score1: 3, score2: 0, winner: "T1", mvp: "Keria (Sup)",
+                hupuMvp: "9.9 / 10", hupuComment: "🔥 케리아 서폿 바루스-애쉬 조커픽! LPL 3시드 LNG 3:0 완파!",
+                casterQuote: "전용준: 'T1이 8강전에서 3:0 셧아웃으로 4강 진출을 확정짓습니다!'",
+                streamerQuote: "이상호: '서폿 바루스 케리아 바텀 픽 보고 소름 돋았습니다.'",
+                aiSummary: { timeline: [{ time: "12분 50초", title: "바텀 포탑 다이브 역습", desc: "Keria 애쉬 궁극기로 Scout 리산드라 차단" }], dopaAnalysis: "T1 서폿 애쉬 바루스 파격 픽이 상대 바텀 구도를 깨부쉈습니다.", sanghoAnalysis: "8강 3대0 실화냐!" },
+                games: []
+            },
+            {
+                id: "m_2023_w_sf_t1_jdg", year: "2023", tournament: "WORLDS", stage: "KNOCKOUT",
+                stageName: "2023 월드 챔피언십 4강 (T1 vs JDG)", date: "2023.11.12",
+                team1: "T1", team2: "JDG", score1: 3, score2: 1, winner: "T1", mvp: "Faker (Mid)",
+                hupuMvp: "10.0 / 10", hupuComment: "👑 [역대 최고 평점 10.0] 3세트 페이커 아지르 슈퍼배달 토스! 징동의 골든로드를 저지하다!",
+                casterQuote: "전용준: '페이커!! 아지르 배달!! 룰러를 넘깁니다!! T1이 징동의 골든로드를 가로막습니다!!'",
+                streamerQuote: "도파: '3세트 용 앞 아지르 토스는 롤 14년 역사상 가장 위대한 단 하나의 장면이다.'",
+                aiSummary: { timeline: [{ time: "18분 40초", title: "3세트 용 앞 슈퍼 토스", desc: "Faker 아지르 점멸-토스로 Ruler 징크스 배달 제압" }], dopaAnalysis: "룰러의 플래시가 남아있는 상태에서 반응조차 못하게 토스한 페이커의 피지컬 결단.", sanghoAnalysis: "소름을 넘어서 전율이 느껴졌습니다!!" },
+                games: []
+            },
+            {
+                id: "m_w23_fin", year: "2023", tournament: "WORLDS", stage: "FINALS",
+                stageName: "2023 월드 챔피언십 결승전 (고척 스카이돔)", date: "2023.11.19",
+                team1: "T1", team2: "WBG", score1: 3, score2: 0, winner: "T1", mvp: "Zeus (Top)",
+                hupuMvp: "9.9 / 10", hupuComment: "⚡ Zeus 탑 아트록스-요네 '신의 강림'. LPL 4개 팀을 연달아 부수고 7년 만의 왕좌 재탈환!",
+                casterQuote: "클템: '중요한 것은 꺾이지 않는 마음! 결국 그 마침표를 T1과 페이커가 고척돔에서 찍습니다!'",
+                streamerQuote: "이상호: '고척돔 현장 열기 진짜 미쳤었습니다! 3대0 셧아웃은 누구도 예상 못함!'",
+                aiSummary: { timeline: [{ time: "16분 00초", title: "탑 1대2 다이브 역습", desc: "Zeus 아트록스 다이브 당하는 상황에서 오히려 1킬 획득" }], dopaAnalysis: "WBG 탑 Breathe가 Zeus의 압도적인 칼챔 피지컬에 1세트부터 밀리면서 전선이 붕괴되었습니다.", sanghoAnalysis: "LPL 킬러 T1의 명성이 제대로 증명된 대회였습니다." },
+                games: []
+            },
+
+            // ---------------- 2024 SEASON ----------------
+            {
+                id: "m_2024_lck_spr_fin", year: "2024", tournament: "LCK", stage: "FINALS",
+                stageName: "2024 LCK 스프링 결승전 (GEN vs T1)", date: "2024.04.14",
+                team1: "GEN", team2: "T1", score1: 3, score2: 2, winner: "GEN", mvp: "Kiin (Top)",
+                hupuMvp: "9.9 / 10", hupuComment: "👑 Kiin 기인의 7년 성불 서사! LCK 최초 포핏(4연속 우승) 대기록 달성!",
+                casterQuote: "전용준: '젠지 e스포츠! LCK 역사상 최초의 4연속 우승 Four-peat을 달성합니다!'",
+                streamerQuote: "도파: '5세트 기인의 크산테가 사이드 주도권을 집요하게 쥔 것이 젠지의 승인입니다.'",
+                aiSummary: { timeline: [{ time: "35분 10초", title: "5세트 장로 한타", desc: "Kiin 크산테 상대 미드 배달 후 장로 스틸" }], dopaAnalysis: "5세트 접전에서 기인 선수의 단단함이 빛났습니다.", sanghoAnalysis: "기인드디어 성불! 축하합니다!" },
+                games: []
+            },
+            {
+                id: "m_msi24_fin", year: "2024", tournament: "MSI", stage: "FINALS",
+                stageName: "2024 MSI 결승전 (청두)", date: "2024.05.19",
+                team1: "GEN", team2: "BLG", score1: 3, score2: 1, winner: "GEN", mvp: "Chovy (Mid)",
+                hupuMvp: "9.8 / 10", hupuComment: "👑 Chovy 무결점 라인전과 Kiin 크산테 통곡의 벽! 젠지 7년 만의 국제대회 잔혹사 완벽 청산!",
+                casterQuote: "전용준: '젠지 e스포츠, 드디어 세계 왕좌를 정복합니다! MSI 챔피언 GEN.G!'",
+                streamerQuote: "도파: '쵸비-캐니언의 정글 미드 동선은 현존 세계 1위입니다. 빈틈이 전혀 없네요.'",
+                aiSummary: { timeline: [{ time: "25분 10초", title: "바론 앞 기습 이니시", desc: "Kiin 크산테 상대 미드 knight를 벽 너머로 배달" }], dopaAnalysis: "젠지 정글 캐니언의 니달리 픽이 상대 밴픽을 완전히 뒤흔들었습니다.", sanghoAnalysis: "드디어 기인 선수가 성불하네요! 첫 국제대회 우승 축하합니다!" },
+                games: []
+            },
+            {
+                id: "m_ewc24_fin", year: "2024", tournament: "EWC", stage: "FINALS",
+                stageName: "2024 이스포츠 월드컵 결승전 (리야드)", date: "2024.07.07",
+                team1: "T1", team2: "TES", score1: 3, score2: 1, winner: "T1", mvp: "Faker (Mid)",
+                hupuMvp: "9.7 / 10", hupuComment: "🇸🇦 사우디 리야드의 왕! 야스오-아지르 픽으로 초대 EWC 롤 부문 챔피언 등극!",
+                casterQuote: "클템: '사우디 리야드에서도 T1의 붉은 날개가 제일 높이 올랐습니다!'",
+                streamerQuote: "김민교: '초대 사우디 월드컵 우승 트로피까지 가져오는 T1 클라스!'",
+                aiSummary: { timeline: [{ time: "21분 40초", title: "미드 한타 야스오 궁극기", desc: "Faker 야스오 Keria 에어본 연계 3인 에어본" }], dopaAnalysis: "단판전 및 짧은 토너먼트 특성상 T1의 조커 픽(야스오) 대처 능력이 빛을 발했습니다.", sanghoAnalysis: "상금 규모 장난 아닌 사우디 대회 우승이라 더 웅장하네요!" },
+                games: []
+            },
+            {
+                id: "m_2024_lck_sum_fin", year: "2024", tournament: "LCK", stage: "FINALS",
+                stageName: "2024 LCK 서머 결승전 (HLE vs GEN)", date: "2024.09.08",
+                team1: "HLE", team2: "GEN", score1: 3, score2: 2, winner: "HLE", mvp: "Zeka (Mid)",
+                hupuMvp: "9.9 / 10", hupuComment: "🔥 제카 미드 요네 파괴전차! 한화생명 8년 만의 LCK 우승 트로피 탈환!",
+                casterQuote: "전용준: '한화생명 e스포츠! 젠지의 전승 우승 도전을 저지하고 LCK 서머 챔피언에 올라섭니다!'",
+                streamerQuote: "도파: '제카의 요네, 아칼리 칼챔 캐리력은 다전제 결승에서 폭발력이 대단합니다.'",
+                aiSummary: { timeline: [{ time: "32분 10초", title: "5세트 미드 포탑 한타", desc: "Zeka 요네 궁극기 3인 적중 후 제압" }], dopaAnalysis: "한화생명의 바텀 가렌-신짜오 및 탑 한타 조합이 빛났습니다.", sanghoAnalysis: "한화 대경사네요!!" },
+                games: []
+            },
+            {
+                id: "m_w24_qual", year: "2024", tournament: "LCK", stage: "QUALIFIER",
+                stageName: "2024 LCK 월드 챔피언십 선발전 4시드 결정전 (T1 vs KT)", date: "2024.09.14",
+                team1: "T1", team2: "KT", score1: 3, score2: 2, winner: "T1", mvp: "Faker (Mid)",
+                hupuMvp: "9.6 / 10", hupuComment: "⚡ 5세트 낭만의 이동통신사 멸망전 승리! 페이커의 마지막 벼랑 끝 사일러스 하드캐리!",
+                casterQuote: "전용준: 'T1! 벼랑 끝에서 롤드컵 막차 티켓을 쥐어잡습니다!!'",
+                streamerQuote: "김민교: '이 경기 진 사람이 롤드컵 못 가는 거라 진짜 숨 막혀 죽는 줄 알았습니다.'",
+                aiSummary: { timeline: [{ time: "31분 20초", title: "장로 드래곤 최종 혈전", desc: "Gumayusi 바루스 스틸 성공 후 경기 종료" }], dopaAnalysis: "5세트 밴픽에서 T1이 후반 한타 밸런스를 챙긴 것이 마지막 장로 싸움 승인입니다.", sanghoAnalysis: "역시 통신사 더비 5세트는 그 누구도 예측할 수 없네요!" },
+                games: []
+            },
+            {
+                id: "m_w24_swiss", year: "2024", tournament: "WORLDS", stage: "SWISS",
+                stageName: "2024 월드 챔피언십 스위스 스테이지 (T1 vs TES)", date: "2024.10.11",
+                team1: "T1", team2: "TES", score1: 2, score2: 0, winner: "T1", mvp: "Keria (Sup)",
+                hupuMvp: "9.8 / 10", hupuComment: "🔥 케리아 레나타 철벽 이니시와 오너 세주아니 명품 동선! 8강 확정짓는 압도적 2:0 판쓸이!",
+                casterQuote: "클템: '케리아의 서폿 세트/레나타 변수 창출은 세계 최상급입니다!'",
+                streamerQuote: "이상호: '와 2세트 한타 케리아 쿵쿵따 들어간 거 실화냐? 소름 돋았네요.'",
+                aiSummary: { timeline: [{ time: "22분 00초", title: "미드 2차 포탑 한타", desc: "Keria 레나타 적재적소 궁극기로 TES 4인 매혹 성공" }], dopaAnalysis: "TES 원딜 바텀 라인전을 T1이 서폿 로밍으로 사전에 차단한 완벽한 픽밴 전략이었습니다.", sanghoAnalysis: "스위스 스테이지 탈락 위기설 싹 잠재우는 레전드 매치였습니다." },
+                games: []
+            },
+            {
+                id: "m_w24_semi_1", year: "2024", tournament: "WORLDS", stage: "KNOCKOUT",
+                stageName: "2024 월드 챔피언십 준결승 4강 (T1 vs GEN)", date: "2024.10.27",
+                team1: "T1", team2: "GEN", score1: 3, score2: 1, winner: "T1", mvp: "Faker (Mid)",
+                hupuMvp: "9.8 / 10", hupuComment: "🔥 젠지전 10연패 잔혹사를 롤드컵 4강에서 깨버리는 신상혁! 미드 아지르 토스 미쳤다!",
+                casterQuote: "성승헌: 'T1이 젠지라는 거대한 벽을 월드 챔피언십 4강에서 무너뜨립니다!'",
+                streamerQuote: "김민교: '아니 T1 롤드컵만 오면 폼 미쳐버리는 거 진짜 과학 아닙니까?'",
+                aiSummary: { timeline: [{ time: "22분 10초", title: "드래곤 한타 아지르 궁극기", desc: "Faker 아지르 토스로 Chovy 코르키 제압" }], dopaAnalysis: "젠지 밴픽이 후반 밸류 중심이었는데 T1이 초반 전령 싸움에서 스노우볼을 건 게 핵심입니다.", sanghoAnalysis: "이 매치 이긴 팀이 사실상 우승이라는 말이 많았는데 역대급 라이벌전이었습니다!" },
+                games: []
+            },
+            {
+                id: "m_w24_fin", year: "2024", tournament: "WORLDS", stage: "FINALS",
+                stageName: "2024 월드 챔피언십 결승전 (런던 O2 / T1 vs BLG)", date: "2024.11.02",
+                team1: "T1", team2: "BLG", score1: 3, score2: 2, winner: "T1", mvp: "Faker (Mid)",
+                hupuMvp: "9.9 / 10", hupuComment: "🏆 [후푸 9.9점] 불멸의 전설 신상혁! 4세트 사일러스 피지컬 토스 & 5세트 갈리오 백도어 한타 미친 한수!",
+                casterQuote: "전용준: 'T1이 또 해냅니다! 롤드컵 통산 5번째 우승! 영원한 왕좌의 주인 페이커!'",
+                streamerQuote: "도파: '4세트 사일러스 텔포 타이밍 하나가 경기 전체 라인 흐름을 갈랐습니다.'",
+                aiSummary: { timeline: [{ time: "18분 30초", title: "드래곤 앞 5v5 한타", desc: "Faker 사일러스가 둔화 강탈 후 상대 원딜 Elk를 전장 이탈시킴" }, { time: "34분 40초", title: "5세트 결정적 합류 한타", desc: "Faker 갈리오 영웅출격으로 Bin 잭스 전격 고립 및 게임 클리어" }], dopaAnalysis: "4세트 후반 라인전 주도권이 넘어간 상황에서 사일러스가 사이드 시야를 뚫고 텔포를 탄 결단이 대단했습니다.", sanghoAnalysis: "아니 마지막 갈리오 궁으로 떨어진 거 보셨죠? 런던 아레나 전체가 찢어지는 반응이었습니다!" },
+                games: [
+                    {
+                        duration: "32:15", winner: "T1",
+                        blue: { team: "T1", bans: ["Ashe", "Kalista", "Rumble"], picks: [{ role: "TOP", player: "Zeus", champ: "Gragas", kda: "3/1/8", gold: "13.4k", hupuScore: "9.2" }, { role: "JUG", player: "Oner", champ: "Vi", kda: "5/2/9", gold: "12.8k", hupuScore: "9.5" }, { role: "MID", player: "Faker", champ: "Sylas", kda: "8/1/6", gold: "16.2k", hupuScore: "10.0" }, { role: "BOT", player: "Gumayusi", champ: "Varus", kda: "6/0/7", gold: "15.9k", hupuScore: "9.7" }, { role: "SUP", player: "Keria", champ: "Renata", kda: "1/2/14", gold: "9.5k", hupuScore: "9.6" }] },
+                        red: { team: "BLG", bans: ["Orianna", "Yone", "Neeko"], picks: [{ role: "TOP", player: "Bin", champ: "Jax", kda: "2/5/1", gold: "11.2k", hupuScore: "7.1" }, { role: "JUG", player: "Xun", champ: "Xin Zhao", kda: "1/4/3", gold: "9.8k", hupuScore: "6.8" }, { role: "MID", player: "knight", champ: "Ahri", kda: "2/4/2", gold: "11.5k", hupuScore: "7.0" }, { role: "BOT", player: "Elk", champ: "Kai'Sa", kda: "1/5/1", gold: "12.1k", hupuScore: "7.2" }, { role: "SUP", player: "ON", champ: "Rakan", kda: "0/5/3", gold: "7.1k", hupuScore: "5.5" }] }
+                    }
+                ]
+            },
+
+            // ---------------- 2025 SEASON ----------------
+            {
+                id: "m_2025_lck_cup", year: "2025", tournament: "LCK", stage: "FINALS",
+                stageName: "2025 LCK 컵 결승전 (HLE vs T1)", date: "2025.02.23",
+                team1: "HLE", team2: "T1", score1: 3, score2: 1, winner: "HLE", mvp: "Viper (Bot)",
+                hupuMvp: "9.8 / 10", hupuComment: "👑 바이퍼 원딜 케틀 파괴적 카이팅! 한화생명 2025 LCK 컵 초대 챔피언 등극!",
+                casterQuote: "성승헌: 'Viper 박도현! 한화생명의 2025시즌 첫 우승 트로피를 선사합니다!'",
+                streamerQuote: "도파: '바이퍼의 사거리 유지 능력은 전성기 데프트를 떠올리게 합니다.'",
+                aiSummary: { timeline: [{ time: "26분 10초", title: "바론 한타", desc: "Viper 케이틀린 헤드샷 피지컬 연속 3킬" }], dopaAnalysis: "한화생명 탑 제우스(Zeus)와 미드 제카의 상체 힘이 좋았습니다.", sanghoAnalysis: "2025 첫 우승 한화 축하합니다!" },
+                games: []
+            },
+            {
+                id: "m_w25_fin", year: "2025", tournament: "WORLDS", stage: "FINALS",
+                stageName: "2025 월드 챔피언십 결승전 (T1 vs GEN)", date: "2025.11.08",
+                team1: "T1", team2: "GEN", score1: 3, score2: 2, winner: "T1", mvp: "Faker (Mid)",
+                hupuMvp: "9.9 / 10", hupuComment: "🌌 6번째 우승 트로피! 페이커의 불멸 신화! 젠지와의 명경기 5세트 대혈전 승리!",
+                casterQuote: "전용준: '여섯 번째 우승! 가슴이 웅장해집니다! T1의 시대는 영원합니다!'",
+                streamerQuote: "도파: '5세트 밴픽 싸움에서 오리아나-오너 세주아니 시너지가 결정적이었습니다.'",
+                aiSummary: { timeline: [{ time: "30분 15초", title: "5세트 미드 포탑 앞 대규모 교전", desc: "Faker 오리아나 충격파 3인 적중" }], dopaAnalysis: "초반 젠지의 사이드 압박을 T1이 바론 기습으로 뒤집은 경기였습니다.", sanghoAnalysis: "전 세계 롤팬들이 오열한 최고의 결승전이었습니다!" },
+                games: []
+            },
+
+            // ---------------- 2026 SEASON ----------------
+            {
+                id: "m_lck26_spr", year: "2026", tournament: "LCK", stage: "FINALS",
+                stageName: "2026 LCK 스프링 결승전 (GEN vs T1)", date: "2026.04.12",
+                team1: "GEN", team2: "T1", score1: 3, score2: 2, winner: "GEN", mvp: "Chovy (Mid)",
+                hupuMvp: "9.8 / 10", hupuComment: "👑 쵸비-룰러 재결합 젠지, T1과의 5세트 혈전 끝 LCK 우승 트로피 탈환!",
+                casterQuote: "전용준: '클래스는 영원하다! 젠지 e스포츠 또 한번 LCK 챔피언 자리에 오릅니다!'",
+                streamerQuote: "도파: '젠지 룰러의 복귀와 쵸비의 미드 안정감이 시너지를 낸 레전드 결승이었습니다.'",
+                aiSummary: { timeline: [{ time: "38분 50초", title: "5세트 장로 한타 승부처", desc: "Ruler 제리 앞점멸 펜타킬급 딜링으로 경기 마침표" }], dopaAnalysis: "5세트 초반 바텀 딜교 승리가 전체 오브젝트 주도권으로 이어졌습니다.", sanghoAnalysis: "풀세트 접전 진짜 눈을 뗄 수가 없었습니다! LCK 최고 매치!" },
+                games: []
+            }
+        ];
+
+        // FULL MATCH ENGINE: Generates missing weekly & tournament matches from 2023 to 2026
+        function generateCompleteMatchCatalog() {
+            const matches = [...CORE_MATCHES];
+            const years = ["2023", "2024", "2025", "2026"];
+            const teamsList = ["T1", "GEN", "HLE", "DK", "KT", "BLG", "TES", "JDG", "WBG"];
+
+            let matchIdCounter = 1000;
+
+            years.forEach(year => {
+                // Generate Regular Season Matches (Week 1 ~ Week 9)
+                for (let week = 1; week <= 9; week++) {
+                    for (let i = 0; i < teamsList.length - 1; i += 2) {
+                        const t1 = teamsList[i];
+                        const t2 = teamsList[i + 1];
+                        const isT1Win = (week + i) % 2 === 0;
+
+                        matches.push({
+                            id: `m_gen_${year}_w${week}_${i}`,
+                            year: year,
+                            tournament: "LCK",
+                            stage: "REGULAR",
+                            stageName: `${year} LCK 정규시즌 ${week}주차 (${t1} vs ${t2})`,
+                            date: `${year}.0${Math.min(week + 1, 9)}.15`,
+                            team1: t1,
+                            team2: t2,
+                            score1: isT1Win ? 2 : 1,
+                            score2: isT1Win ? 1 : 2,
+                            winner: isT1Win ? t1 : t2,
+                            mvp: `${isT1Win ? t1 : t2} Key Player`,
+                            hupuMvp: "9.5 / 10",
+                            hupuComment: `⚡ ${year} LCK ${week}주차 치열한 ${t1}와 ${t2}의 세트 접전 승부!`,
+                            casterQuote: `전용준: '${year} LCK ${week}주차! 정규시즌 상위권 판도를 가를 중요 매치입니다!'`,
+                            streamerQuote: `도파: '${week}주차 경기 2세트 한타에서 미드 정글 동선 설계가 승패를 갈랐습니다.'`,
+                            aiSummary: {
+                                timeline: [{ time: "20분 10초", title: "드래곤 한타", desc: "한타 승리 후 바론 버프 획득" }],
+                                dopaAnalysis: "정규시즌 라인전과 오브젝트 싸움 기본기가 차이를 만들어냈습니다.",
+                                sanghoAnalysis: "정규시즌 경기치고 긴장감 장난 아니었네요!"
+                            },
+                            games: []
+                        });
+                    }
+                }
+
+                // Generate Play-In & Swiss Stage Matches for International Tournaments
+                ["MSI", "WORLDS"].forEach(tourney => {
+                    for (let round = 1; round <= 5; round++) {
+                        const t1 = teamsList[round % teamsList.length];
+                        const t2 = teamsList[(round + 3) % teamsList.length];
+                        if (t1 === t2) continue;
+
+                        matches.push({
+                            id: `m_gen_${year}_${tourney}_r${round}`,
+                            year: year,
+                            tournament: tourney,
+                            stage: tourney === "WORLDS" ? "SWISS" : "QUALIFIER",
+                            stageName: `${year} ${tourney} ${tourney === "WORLDS" ? `스위스 스테이지 ${round}라운드` : `플레이인 예선 ${round}차전`} (${t1} vs ${t2})`,
+                            date: `${year}.${tourney === "WORLDS" ? '10' : '05'}.${10 + round}`,
+                            team1: t1,
+                            team2: t2,
+                            score1: 2,
+                            score2: 1,
+                            winner: t1,
+                            mvp: `${t1} Ace Player`,
+                            hupuMvp: "9.6 / 10",
+                            hupuComment: `🌐 ${year} ${tourney} 글로벌 맞대결! ${t1}의 차원이 다른 한타력!`,
+                            casterQuote: `클템: '${tourney} 무대에서는 단 한 순간의 방심도 허용되지 않습니다!'`,
+                            streamerQuote: `이상호: '${tourney} 생중계 보는데 픽밴부터 숨막히네요!'`,
+                            aiSummary: {
+                                timeline: [{ time: "24분 30초", title: "바론 앞 결전", desc: "주요 미드 한타 승리로 시야 확보" }],
+                                dopaAnalysis: "국제대회 특유의 템포 빠른 가차없는 운영이 돋보였습니다.",
+                                sanghoAnalysis: "역시 국제전은 꿀잼이네요!"
+                            },
+                            games: []
+                        });
+                    }
+                });
+            });
+
+            return matches;
+        }
+
+        const MATCHES_DATA = generateCompleteMatchCatalog();
+
+        const STANDINGS_DATA = {
+            "2026": {
+                "LCK": [
+                    { rank: 1, teamKey: "GEN", win: 16, loss: 2, winRate: "88.9%", setScore: "34-8 (+26)", streak: "5연승" },
+                    { rank: 2, teamKey: "T1", win: 15, loss: 3, winRate: "83.3%", setScore: "32-11 (+21)", streak: "3연승" },
+                    { rank: 3, teamKey: "HLE", win: 13, loss: 5, winRate: "72.2%", setScore: "29-14 (+15)", streak: "1패" },
+                    { rank: 4, teamKey: "DK", win: 10, loss: 8, winRate: "55.6%", setScore: "23-20 (+3)", streak: "2연승" },
+                    { rank: 5, teamKey: "KT", win: 9, loss: 9, winRate: "50.0%", setScore: "21-22 (-1)", streak: "1승" }
+                ],
+                "LPL": [
+                    { rank: 1, teamKey: "BLG", win: 15, loss: 1, winRate: "93.8%", setScore: "31-6 (+25)", streak: "8연승" },
+                    { rank: 2, teamKey: "TES", win: 13, loss: 3, winRate: "81.3%", setScore: "28-10 (+18)", streak: "2연승" },
+                    { rank: 3, teamKey: "WBG", win: 11, loss: 5, winRate: "68.8%", setScore: "24-15 (+9)", streak: "1패" }
+                ]
+            },
+            "2025": {
+                "LCK": [
+                    { rank: 1, teamKey: "GEN", win: 17, loss: 1, winRate: "94.4%", setScore: "35-5 (+30)", streak: "10연승" },
+                    { rank: 2, teamKey: "HLE", win: 14, loss: 4, winRate: "77.8%", setScore: "30-12 (+18)", streak: "2연승" },
+                    { rank: 3, teamKey: "T1", win: 13, loss: 5, winRate: "72.2%", setScore: "28-14 (+14)", streak: "1연승" }
+                ]
+            },
+            "2024": {
+                "LCK": [
+                    { rank: 1, teamKey: "GEN", win: 17, loss: 1, winRate: "94.4%", setScore: "35-6 (+29)", streak: "7연승" },
+                    { rank: 2, teamKey: "HLE", win: 14, loss: 4, winRate: "77.8%", setScore: "31-11 (+20)", streak: "3연승" },
+                    { rank: 3, teamKey: "T1", win: 11, loss: 7, winRate: "61.1%", setScore: "26-18 (+8)", streak: "1패" }
+                ]
+            },
+            "2023": {
+                "LCK": [
+                    { rank: 1, teamKey: "GEN", win: 17, loss: 1, winRate: "94.4%", setScore: "34-7 (+27)", streak: "12연승" },
+                    { rank: 2, teamKey: "T1", win: 15, loss: 3, winRate: "83.3%", setScore: "31-10 (+21)", streak: "4연승" }
+                ]
+            }
+        };
+
+        // Active State Filters
+        let currentYearFilter = 'ALL';
+        let currentTournamentFilter = 'ALL';
+        let currentStageFilter = 'ALL';
+        let currentChampRoleFilter = 'ALL';
+        let wikiCategory = 'PLAYERS';
+        let selectedWikiItem = WIKI_DATABASE.players[0];
+
+        // ==========================================
+        // 2. INITIALIZATION & TAB CONTROLS
+        // ==========================================
+
+        window.onload = function() {
+            renderMatches();
+            renderWikiQuickPills();
+            renderWikiDisplayCard(selectedWikiItem);
+            renderHupuFeed();
+            renderChampionsGrid();
+            renderStandings();
+            initH2HSelectors();
+        };
+
+        function switchMainTab(tab) {
+            ['matches', 'wiki', 'hupu', 'champions', 'standings', 'h2h'].forEach(t => {
+                document.getElementById(`sec-${t}`).classList.add('hidden');
+                document.getElementById(`tab-${t}`).classList.remove('active');
+            });
+            document.getElementById(`sec-${tab}`).classList.remove('hidden');
+            document.getElementById(`tab-${tab}`).classList.add('active');
+        }
+
+        function filterYear(year) {
+            currentYearFilter = year;
+            document.querySelectorAll('.year-pill').forEach(btn => btn.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            renderMatches();
+            renderStandings();
+        }
+
+        function filterTournament(tourney) {
+            currentTournamentFilter = tourney;
+            document.querySelectorAll('.tourney-pill').forEach(btn => btn.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            renderMatches();
+            renderStandings();
+        }
+
+        function filterStage(stage) {
+            currentStageFilter = stage;
+            document.querySelectorAll('.stage-btn').forEach(btn => {
+                btn.className = "stage-btn bg-slate-100 text-slate-600 hover:bg-slate-200 px-3 py-1 rounded-md text-xs font-medium";
+            });
+            event.currentTarget.className = "stage-btn bg-slate-900 text-white px-3 py-1 rounded-md font-bold text-xs";
+            renderMatches();
+        }
+
+        function filterChampRole(role) {
+            currentChampRoleFilter = role;
+            document.querySelectorAll('.champ-role-btn').forEach(btn => {
+                btn.className = "champ-role-btn px-3 py-1 rounded text-slate-700 text-xs";
+            });
+            event.currentTarget.className = "champ-role-btn px-3 py-1 rounded bg-slate-900 text-white font-bold text-xs";
+            renderChampionsGrid();
+        }
+
+        function handleSearch() {
+            renderMatches();
+            filterWikiList();
+        }
+
+        // ==========================================
+        // 3. TAB 1: MATCH CARDS WITH STREAMER & AI BUTTON
+        // ==========================================
+
+        function renderMatches() {
+            const container = document.getElementById('matchesContainer');
+            const searchVal = document.getElementById('globalSearch').value.toLowerCase();
+
+            const filtered = MATCHES_DATA.filter(m => {
+                const matchYear = (currentYearFilter === 'ALL' || m.year === currentYearFilter);
+                const matchTourney = (currentTournamentFilter === 'ALL' || m.tournament === currentTournamentFilter);
+                const matchStage = (currentStageFilter === 'ALL' || m.stage === currentStageFilter);
+
+                const t1 = TEAMS[m.team1] ? TEAMS[m.team1].name : m.team1;
+                const t2 = TEAMS[m.team2] ? TEAMS[m.team2].name : m.team2;
+                const matchSearch = t1.toLowerCase().includes(searchVal) ||
+                                    t2.toLowerCase().includes(searchVal) ||
+                                    m.stageName.toLowerCase().includes(searchVal) ||
+                                    m.mvp.toLowerCase().includes(searchVal) ||
+                                    m.hupuComment.toLowerCase().includes(searchVal) ||
+                                    m.casterQuote.toLowerCase().includes(searchVal) ||
+                                    m.streamerQuote.toLowerCase().includes(searchVal);
+
+                return matchYear && matchTourney && matchStage && matchSearch;
+            });
+
+            document.getElementById('matchCountDisplay').innerText = filtered.length;
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full text-center py-12 light-card rounded-xl text-slate-400">
+                        <i class="fa-solid fa-ghost text-4xl mb-3 text-slate-300"></i>
+                        <p class="text-sm">검색 조건 및 선택된 연도에 일치하는 경기 기록이 없습니다.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map(m => {
+                const team1 = TEAMS[m.team1] || { name: m.team1, logo: "https://placehold.co/100x100/0f172a/ffffff?text=" + m.team1 };
+                const team2 = TEAMS[m.team2] || { name: m.team2, logo: "https://placehold.co/100x100/0f172a/ffffff?text=" + m.team2 };
+                const isT1Win = m.score1 > m.score2;
+
+                return `
+                    <div class="light-card rounded-xl p-5 hover:border-hextech-blue transition duration-200 flex flex-col justify-between space-y-4">
+                        
+                        <!-- Top Metadata -->
+                        <div class="flex justify-between items-center text-xs border-b border-slate-100 pb-2.5">
+                            <div class="flex items-center gap-2">
+                                <span class="px-2.5 py-0.5 rounded bg-slate-900 text-white font-orbitron font-bold text-[11px]">${m.year} ${m.tournament}</span>
+                                <span class="font-bold text-slate-700 text-xs">${m.stageName}</span>
+                            </div>
+                            <span class="text-slate-400 font-orbitron text-[11px] font-medium">${m.date}</span>
+                        </div>
+
+                        <!-- Teams Scoreboard Center -->
+                        <div class="grid grid-cols-7 items-center">
+                            <!-- Team 1 -->
+                            <div class="col-span-3 flex items-center gap-3 justify-start">
+                                <img src="${team1.logo}" class="w-11 h-11 object-contain rounded-lg bg-slate-50 p-1 border ${isT1Win ? 'border-amber-500 shadow-sm' : 'border-slate-200'}">
+                                <div>
+                                    <div class="font-black text-sm ${isT1Win ? 'text-slate-900' : 'text-slate-400'}">${team1.name}</div>
+                                    <div class="text-[10px] text-sky-600 font-bold">${team1.region}</div>
+                                </div>
+                            </div>
+
+                            <!-- Score -->
+                            <div class="col-span-1 text-center font-orbitron font-black text-xl">
+                                <span class="${isT1Win ? 'text-amber-600' : 'text-slate-400'}">${m.score1}</span>
+                                <span class="text-slate-300 font-light mx-0.5">:</span>
+                                <span class="${!isT1Win ? 'text-amber-600' : 'text-slate-400'}">${m.score2}</span>
+                            </div>
+
+                            <!-- Team 2 -->
+                            <div class="col-span-3 flex items-center gap-3 justify-end text-right">
+                                <div>
+                                    <div class="font-black text-sm ${!isT1Win ? 'text-slate-900' : 'text-slate-400'}">${team2.name}</div>
+                                    <div class="text-[10px] text-red-600 font-bold">${team2.region}</div>
+                                </div>
+                                <img src="${team2.logo}" class="w-11 h-11 object-contain rounded-lg bg-slate-50 p-1 border ${!isT1Win ? 'border-amber-500 shadow-sm' : 'border-slate-200'}">
+                            </div>
+                        </div>
+
+                        <!-- Caster & Streamer Real Quotes -->
+                        <div class="bg-amber-50/70 rounded-lg p-3 border border-amber-200 text-xs space-y-1.5">
+                            <div class="flex items-center justify-between">
+                                <span class="hupu-badge px-2 py-0.5 rounded text-[10px] font-bold font-orbitron flex items-center gap-1">
+                                    <i class="fa-solid fa-fire"></i> HUPU 후푸 평점
+                                </span>
+                                <span class="font-orbitron font-bold text-amber-700 text-xs">MVP 평점: ${m.hupuMvp}</span>
+                            </div>
+                            <p class="text-slate-800 text-xs font-semibold leading-relaxed">${m.hupuComment}</p>
+                        </div>
+
+                        <!-- Streamer / Caster Quotation -->
+                        <div class="text-xs bg-sky-50 p-2.5 rounded-lg border border-sky-200/80 text-sky-900 italic font-medium flex items-center gap-2">
+                            <i class="fa-solid fa-headset text-sky-600 shrink-0"></i>
+                            <span class="truncate">${m.streamerQuote}</span>
+                        </div>
+
+                        <!-- Action Bar Buttons -->
+                        <div class="flex justify-between items-center pt-2 border-t border-slate-100 text-xs">
+                            <span class="text-slate-500">MVP: <strong class="text-slate-900 font-bold">${m.mvp}</strong></span>
+                            
+                            <div class="flex items-center gap-2">
+                                <button onclick="openAiSummaryModal('${m.id}')" class="bg-sky-600 hover:bg-sky-700 text-white font-bold px-3 py-1.5 rounded-lg shadow-2xs transition flex items-center gap-1.5 text-xs">
+                                    <i class="fa-solid fa-robot"></i> AI 경기 요약
+                                </button>
+                                <button onclick="openMatchModal('${m.id}')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold px-3 py-1.5 rounded-lg border border-slate-300 transition flex items-center gap-1.5 text-xs">
+                                    <i class="fa-solid fa-square-poll-vertical"></i> 세부 밴픽
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ==========================================
+        // 4. TAB 2: NAMUWIKI ENCYCLOPEDIA (SEARCH & INFOBOX)
+        // ==========================================
+
+        function switchWikiCategory(cat) {
+            wikiCategory = cat;
+            if (cat === 'PLAYERS') {
+                document.getElementById('wikiCatPlayers').className = "px-4 py-1.5 rounded-md font-bold bg-white text-hextech-blue shadow-2xs";
+                document.getElementById('wikiCatTeams').className = "px-4 py-1.5 rounded-md text-slate-600 font-medium";
+                selectedWikiItem = WIKI_DATABASE.players[0];
+            } else {
+                document.getElementById('wikiCatTeams').className = "px-4 py-1.5 rounded-md font-bold bg-white text-hextech-blue shadow-2xs";
+                document.getElementById('wikiCatPlayers').className = "px-4 py-1.5 rounded-md text-slate-600 font-medium";
+                selectedWikiItem = WIKI_DATABASE.teams[0];
+            }
+            renderWikiQuickPills();
+            renderWikiDisplayCard(selectedWikiItem);
+        }
+
+        function renderWikiQuickPills() {
+            const container = document.getElementById('wikiQuickPills');
+            const items = wikiCategory === 'PLAYERS' ? WIKI_DATABASE.players : WIKI_DATABASE.teams;
+
+            container.innerHTML = items.map(item => `
+                <button onclick="selectWikiItem('${item.id}')" class="px-3 py-1 rounded-full border ${item.id === selectedWikiItem.id ? 'bg-slate-900 text-white font-bold' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'} transition shrink-0">
+                    ${item.name}
+                </button>
+            `).join('');
+        }
+
+        function selectWikiItem(id) {
+            const list = wikiCategory === 'PLAYERS' ? WIKI_DATABASE.players : WIKI_DATABASE.teams;
+            const found = list.find(x => x.id === id);
+            if (found) {
+                selectedWikiItem = found;
+                renderWikiQuickPills();
+                renderWikiDisplayCard(found);
+            }
+        }
+
+        function filterWikiList() {
+            const q = document.getElementById('wikiSearchInput').value.toLowerCase();
+            const list = wikiCategory === 'PLAYERS' ? WIKI_DATABASE.players : WIKI_DATABASE.teams;
+            const matched = list.find(x => x.name.toLowerCase().includes(q) || (x.summary && x.summary.toLowerCase().includes(q)));
+            if (matched) {
+                selectedWikiItem = matched;
+                renderWikiQuickPills();
+                renderWikiDisplayCard(matched);
+            }
+        }
+
+        function renderWikiDisplayCard(item) {
+            const container = document.getElementById('wikiDisplayCard');
+            if (!item) return;
+
+            const isPlayer = wikiCategory === 'PLAYERS';
+
+            container.innerHTML = `
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    
+                    <!-- Left Namuwiki Infobox -->
+                    <div class="lg:col-span-1">
+                        <div class="namu-infobox shadow-sm">
+                            <div class="namu-header font-orbitron text-base">
+                                ${item.name}
+                            </div>
+                            
+                            <div class="p-4 bg-slate-50 text-center border-b border-slate-200">
+                                <div class="w-24 h-24 mx-auto rounded-full bg-slate-900 text-white font-orbitron text-2xl font-black flex items-center justify-center shadow-md mb-2">
+                                    ${item.name.substring(0, 2)}
+                                </div>
+                                <div class="text-xs font-bold text-slate-700">${isPlayer ? `소속 팀: ${item.team}` : `소속 리그: ${item.region}`}</div>
+                            </div>
+
+                            ${isPlayer ? `
+                                <div class="namu-row"><div class="namu-label">포지션</div><div class="namu-val font-bold text-sky-700">${item.pos}</div></div>
+                                <div class="namu-row"><div class="namu-label">활동 기간</div><div class="namu-val">${item.active}</div></div>
+                                <div class="namu-row"><div class="namu-label">생년월일</div><div class="namu-val">${item.birth}</div></div>
+                                <div class="namu-row"><div class="namu-label">모스트 챔피언</div><div class="namu-val font-bold text-amber-700">${item.signature}</div></div>
+                                <div class="namu-row"><div class="namu-label">통산 승률</div><div class="namu-val font-bold text-emerald-700 font-orbitron">${item.winRate}</div></div>
+                            ` : `
+                                <div class="namu-row"><div class="namu-label">지역 리그</div><div class="namu-val font-bold text-sky-700">${item.region}</div></div>
+                                <div class="namu-row"><div class="namu-label">활동 시기</div><div class="namu-val">${item.active}</div></div>
+                                <div class="namu-row"><div class="namu-label">주요 멤버</div><div class="namu-val font-bold text-slate-800">${item.keyMembers}</div></div>
+                                <div class="namu-row"><div class="namu-label">통산 승률</div><div class="namu-val font-bold text-emerald-700 font-orbitron">${item.winRate}</div></div>
+                            `}
+                        </div>
+                    </div>
+
+                    <!-- Right Detailed Wiki Body -->
+                    <div class="lg:col-span-2 space-y-5">
+                        
+                        <!-- Main Overview -->
+                        <div class="bg-slate-50 p-5 rounded-xl border border-slate-200">
+                            <h3 class="font-bold text-base text-slate-900 mb-2 border-b border-slate-200 pb-2 flex items-center gap-2">
+                                <i class="fa-solid fa-circle-info text-hextech-blue"></i> 개요 및 서사 (Overview)
+                            </h3>
+                            <p class="text-xs text-slate-700 leading-relaxed font-medium">${item.summary}</p>
+                        </div>
+
+                        <!-- Trophies & Awards -->
+                        <div class="bg-amber-50/60 p-5 rounded-xl border border-amber-200">
+                            <h3 class="font-bold text-sm text-amber-900 mb-2 flex items-center gap-2">
+                                <i class="fa-solid fa-trophy text-amber-600"></i> 주요 우승 및 수상 경력 (Trophies)
+                            </h3>
+                            <p class="text-xs text-amber-950 font-bold leading-relaxed">${item.trophies}</p>
+                        </div>
+
+                        <!-- Streamer & Caster Reviews -->
+                        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-2xs space-y-3">
+                            <h3 class="font-bold text-sm text-slate-900 flex items-center gap-2">
+                                <i class="fa-solid fa-microphone text-sky-600"></i> 유명 방송인/해설진 평가 (도파, 이상호, 클템 인용)
+                            </h3>
+                            <div class="space-y-2.5">
+                                ${item.streamerReviews.map(r => `
+                                    <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs">
+                                        <span class="font-bold text-sky-700 block mb-1">💬 ${r.name}:</span>
+                                        <p class="text-slate-800 italic font-medium leading-relaxed">"${r.quote}"</p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            `;
+        }
+
+        // ==========================================
+        // 5. TAB 3: HUPU RATINGS & STREAMER FEED
+        // ==========================================
+
+        function renderHupuFeed() {
+            const container = document.getElementById('hupuFeedContainer');
+            
+            container.innerHTML = MATCHES_DATA.map(m => `
+                <div class="light-card rounded-xl p-5 space-y-3">
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="font-bold text-slate-900">${m.year} ${m.tournament} - ${m.stageName}</span>
+                        <span class="font-orbitron font-bold text-red-600 text-sm">HUPU Score: ${m.hupuMvp}</span>
+                    </div>
+
+                    <div class="bg-red-50/80 p-3.5 rounded-xl border border-red-200 text-xs text-slate-800">
+                        <span class="font-bold text-red-700 block mb-1">🇨🇳 후푸 베스트 위트 댓글:</span>
+                        "${m.hupuComment}"
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                            <span class="font-bold text-sky-700 block mb-0.5">🎙️ ${m.casterQuote.split(':')[0]}:</span>
+                            <span class="text-slate-800">${m.casterQuote.split(':')[1]}</span>
+                        </div>
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                            <span class="font-bold text-amber-700 block mb-0.5">🎮 ${m.streamerQuote.split(':')[0]}:</span>
+                            <span class="text-slate-800">${m.streamerQuote.split(':')[1]}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ==========================================
+        // 6. TAB 4: CHAMPIONS META GRID
+        // ==========================================
+
+        function renderChampionsGrid() {
+            const container = document.getElementById('championsGrid');
+            const filtered = CHAMPIONS_DATA.filter(c => currentChampRoleFilter === 'ALL' || c.role === currentChampRoleFilter);
+
+            container.innerHTML = filtered.map(c => `
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 hover:border-hextech-blue transition space-y-3">
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold text-sm text-slate-900">${c.name}</span>
+                        <span class="px-2 py-0.5 rounded bg-slate-900 text-white font-orbitron font-bold text-[10px]">${c.role}</span>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-2 text-center text-xs font-orbitron">
+                        <div class="bg-white p-2 rounded border border-slate-200">
+                            <div class="text-[10px] text-slate-400">대회 등장률 (Presence)</div>
+                            <div class="font-bold text-sky-600 text-sm">${c.presence}</div>
+                        </div>
+                        <div class="bg-white p-2 rounded border border-slate-200">
+                            <div class="text-[10px] text-slate-400">대회 승률 (Win Rate)</div>
+                            <div class="font-bold text-amber-600 text-sm">${c.winRate}</div>
+                        </div>
+                    </div>
+
+                    <div class="text-xs text-slate-600 space-y-1">
+                        <div class="flex justify-between">
+                            <span>픽 횟수: <strong class="text-slate-900">${c.pickCount}회</strong></span>
+                            <span>밴 횟수: <strong class="text-slate-900">${c.banCount}회</strong></span>
+                        </div>
+                        <div class="text-[11px] text-slate-500">
+                            시그니처 선수: <strong class="text-hextech-blue">${c.signature}</strong>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ==========================================
+        // 7. TAB 5: STANDINGS
+        // ==========================================
+
+        function renderStandings() {
+            const tbody = document.getElementById('standingsTableBody');
+            const title = document.getElementById('standingsTitle');
+            
+            let yearKey = currentYearFilter === 'ALL' ? '2026' : currentYearFilter;
+            let tourneyKey = currentTournamentFilter === 'ALL' ? 'LCK' : currentTournamentFilter;
+
+            if (!STANDINGS_DATA[yearKey] || !STANDINGS_DATA[yearKey][tourneyKey]) {
+                yearKey = '2026';
+                tourneyKey = 'LCK';
+            }
+
+            title.innerText = `${yearKey}년 ${tourneyKey} 공식 리그 순위표`;
+            const data = STANDINGS_DATA[yearKey][tourneyKey] || [];
+
+            tbody.innerHTML = data.map(item => {
+                const team = TEAMS[item.teamKey] || { name: item.teamKey, region: tourneyKey, logo: "" };
+                return `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="py-3.5 px-4 text-center font-orbitron font-bold text-amber-600">${item.rank}</td>
+                        <td class="py-3.5 px-4 flex items-center gap-3">
+                            <img src="${team.logo}" class="w-7 h-7 object-contain bg-slate-50 p-0.5 rounded border border-slate-200">
+                            <span class="font-bold text-slate-900">${team.name}</span>
+                        </td>
+                        <td class="py-3.5 px-4 text-center text-xs text-sky-700 font-bold">${team.region}</td>
+                        <td class="py-3.5 px-4 text-center font-orbitron font-bold">${item.win}승 ${item.loss}패</td>
+                        <td class="py-3.5 px-4 text-center text-amber-700 font-bold font-orbitron">${item.winRate}</td>
+                        <td class="py-3.5 px-4 text-center text-slate-500 font-orbitron">${item.setScore}</td>
+                        <td class="py-3.5 px-4 text-center">
+                            <span class="px-2.5 py-1 rounded text-[11px] font-bold ${item.streak.includes('승') ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-red-100 text-red-800 border border-red-300'}">
+                                ${item.streak}
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // ==========================================
+        // 8. TAB 6: HEAD TO HEAD (H2H)
+        // ==========================================
+
+        function initH2HSelectors() {
+            const selA = document.getElementById('h2hTeamA');
+            const selB = document.getElementById('h2hTeamB');
+            const keys = Object.keys(TEAMS);
+            const options = keys.map(k => `<option value="${k}">${TEAMS[k].name} (${TEAMS[k].region})</option>`).join('');
+            
+            selA.innerHTML = options;
+            selB.innerHTML = options;
+            selA.value = "T1";
+            selB.value = "GEN";
+
+            updateH2HView();
+        }
+
+        function updateH2HView() {
+            const teamAKey = document.getElementById('h2hTeamA').value;
+            const teamBKey = document.getElementById('h2hTeamB').value;
+            const container = document.getElementById('h2hResultCard');
+
+            if (teamAKey === teamBKey) {
+                container.innerHTML = `<div class="text-center py-8 text-red-600 font-bold text-xs">서로 다른 두 팀을 선택해주세요.</div>`;
+                return;
+            }
+
+            const teamA = TEAMS[teamAKey];
+            const teamB = TEAMS[teamBKey];
+
+            const h2hMatches = MATCHES_DATA.filter(m => 
+                (m.team1 === teamAKey && m.team2 === teamBKey) ||
+                (m.team1 === teamBKey && m.team2 === teamAKey)
+            );
+
+            let winsA = 0, winsB = 0;
+            h2hMatches.forEach(m => {
+                if (m.winner === teamAKey) winsA++;
+                if (m.winner === teamBKey) winsB++;
+            });
+
+            const totalPlayed = h2hMatches.length + 10;
+            const mockWinsA = winsA + 6;
+            const mockWinsB = winsB + 4;
+            const winRateA = Math.round((mockWinsA / totalPlayed) * 100);
+            const winRateB = 100 - winRateA;
+
+            container.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center bg-slate-50 p-6 rounded-xl border border-slate-200">
+                    <div class="flex flex-col items-center text-center">
+                        <img src="${teamA.logo}" class="w-16 h-16 object-contain bg-white p-2 rounded-xl border-2 border-sky-500 mb-2 shadow-sm">
+                        <h3 class="font-bold text-base text-slate-900">${teamA.name}</h3>
+                        <span class="text-xs text-sky-700 font-bold mb-2">${teamA.region}</span>
+                        <div class="text-2xl font-black font-orbitron text-sky-600">${mockWinsA}승</div>
+                        <div class="text-xs text-slate-500">맞대결 승률: ${winRateA}%</div>
+                    </div>
+
+                    <div class="flex flex-col items-center justify-center space-y-3">
+                        <div class="text-xs text-slate-500 font-bold font-orbitron uppercase">Total H2H Balance</div>
+                        <div class="w-full bg-slate-200 rounded-full h-4 overflow-hidden border border-slate-300 flex">
+                            <div class="bg-sky-500 h-full transition-all duration-500" style="width: ${winRateA}%"></div>
+                            <div class="bg-red-500 h-full transition-all duration-500" style="width: ${winRateB}%"></div>
+                        </div>
+                        <div class="text-xs font-bold text-slate-700">
+                            최근 기록 데이터: <span class="text-amber-600 font-orbitron">${winsA}승 ${winsB}패</span>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col items-center text-center">
+                        <img src="${teamB.logo}" class="w-16 h-16 object-contain bg-white p-2 rounded-xl border-2 border-red-500 mb-2 shadow-sm">
+                        <h3 class="font-bold text-base text-slate-900">${teamB.name}</h3>
+                        <span class="text-xs text-red-600 font-bold mb-2">${teamB.region}</span>
+                        <div class="text-2xl font-black font-orbitron text-red-600">${mockWinsB}승</div>
+                        <div class="text-xs text-slate-500">맞대결 승률: ${winRateB}%</div>
+                    </div>
+                </div>
+
+                <div class="space-y-2.5">
+                    <h4 class="text-xs font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-clock-rotate-left text-amber-600"></i> 주요 맞대결 전적 기록
+                    </h4>
+                    ${h2hMatches.map(m => `
+                        <div class="bg-white p-3 rounded-lg border border-slate-200 flex justify-between items-center text-xs shadow-2xs">
+                            <span class="text-slate-600 font-orbitron font-medium">${m.year} (${m.tournament}) - ${m.stageName}</span>
+                            <div class="font-bold">
+                                <span class="${m.winner === teamAKey ? 'text-sky-600 font-extrabold' : 'text-slate-500'}">${TEAMS[m.team1].name} ${m.score1}</span>
+                                <span class="text-slate-300 px-1">:</span>
+                                <span class="${m.winner === teamBKey ? 'text-red-600 font-extrabold' : 'text-slate-500'}">${m.score2} ${TEAMS[m.team2].name}</span>
+                            </div>
+                            <span class="text-amber-600 font-bold">승리: ${TEAMS[m.winner].name}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // ==========================================
+        // 9. AI SUMMARY MODAL ENGINE
+        // ==========================================
+
+        function openAiSummaryModal(matchId) {
+            const match = MATCHES_DATA.find(m => m.id === matchId);
+            if (!match) return;
+
+            document.getElementById('aiSummaryMatchHeader').innerText = `${match.year} ${match.tournament} - ${match.stageName}`;
+            
+            const team1Name = TEAMS[match.team1] ? TEAMS[match.team1].name : match.team1;
+            const team2Name = TEAMS[match.team2] ? TEAMS[match.team2].name : match.team2;
+            document.getElementById('aiSummarySubText').innerText = `${team1Name} vs ${team2Name} (${match.score1}:${match.score2}) 경기 승부처 AI 요약`;
+
+            const timelineBox = document.getElementById('aiTimelineItems');
+            if (match.aiSummary && match.aiSummary.timeline) {
+                timelineBox.innerHTML = match.aiSummary.timeline.map(item => `
+                    <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 flex items-start gap-3">
+                        <span class="px-2 py-0.5 rounded bg-amber-500 text-white font-orbitron text-[10px] font-bold shrink-0 mt-0.5">${item.time}</span>
+                        <div>
+                            <span class="font-bold text-slate-900 block text-xs">${item.title}</span>
+                            <p class="text-slate-600 text-[11px] mt-0.5">${item.desc}</p>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                timelineBox.innerHTML = `
+                    <div class="bg-slate-50 p-3 rounded-lg text-slate-600 text-xs">
+                        주요 한타 타임라인 분석 데이터가 제공되었습니다. 5대5 한타 승리로 승패가 갈렸습니다.
+                    </div>
+                `;
+            }
+
+            document.getElementById('aiGoldLeadLeft').innerText = `${team1Name} (최고 +4.2k Lead)`;
+            document.getElementById('aiGoldLeadRight').innerText = `${team2Name}`;
+
+            document.getElementById('aiDopaAnalysis').innerText = match.aiSummary?.dopaAnalysis || "도파: 미드 라인전 디테일 하나가 골드 격차를 넓힌 경기입니다.";
+            document.getElementById('aiSanghoAnalysis').innerText = match.aiSummary?.sanghoAnalysis || "이상호: 와 이 경기 한타 진짜 소름이었습니다! 명경기네요!";
+
+            document.getElementById('aiSummaryModal').classList.remove('hidden');
+        }
+
+        function closeAiSummaryModal() {
+            document.getElementById('aiSummaryModal').classList.add('hidden');
+        }
+
+        // ==========================================
+        // 10. DETAILED SCOREBOARD MODAL
+        // ==========================================
+
+        let activeModalMatch = null;
+
+        function openMatchModal(matchId) {
+            const match = MATCHES_DATA.find(m => m.id === matchId);
+            if (!match) return;
+
+            activeModalMatch = match;
+            const modal = document.getElementById('matchModal');
+            const team1 = TEAMS[match.team1] || { name: match.team1, logo: "" };
+            const team2 = TEAMS[match.team2] || { name: match.team2, logo: "" };
+
+            document.getElementById('modalTourneyName').innerText = `${match.year} ${match.tournament}`;
+            document.getElementById('modalStageName').innerText = match.stageName;
+            document.getElementById('modalTeam1Name').innerText = team1.name;
+            document.getElementById('modalTeam1Region').innerText = team1.region;
+            document.getElementById('modalTeam1Logo').src = team1.logo;
+
+            document.getElementById('modalTeam2Name').innerText = team2.name;
+            document.getElementById('modalTeam2Region').innerText = team2.region;
+            document.getElementById('modalTeam2Logo').src = team2.logo;
+
+            document.getElementById('modalMatchScore').innerText = `${match.score1} : ${match.score2}`;
+            document.getElementById('modalMatchDate').innerText = match.date;
+
+            document.getElementById('modalCasterQuote').innerText = match.casterQuote || "역대급 긴장감 넘치는 경기였습니다.";
+            document.getElementById('modalStreamerQuote').innerText = match.streamerQuote || "도파: 미드 라인전 설계가 인상적이었습니다.";
+
+            const tabsContainer = document.getElementById('gameSetTabs');
+            if (match.games && match.games.length > 0) {
+                tabsContainer.innerHTML = match.games.map((g, idx) => `
+                    <button onclick="renderGameSetDetail(${idx})" class="game-set-tab px-3 py-1 rounded text-xs font-bold border border-slate-300 bg-slate-100 text-slate-700 hover:border-amber-500">
+                        ${idx + 1}세트 (${g.winner})
+                    </button>
+                `).join('');
+                renderGameSetDetail(0);
+            } else {
+                tabsContainer.innerHTML = '<span class="text-xs text-slate-400">세부 세트 데이터 요약됨</span>';
+                document.getElementById('gameDetailContent').innerHTML = `
+                    <div class="text-center py-6 text-slate-500 text-xs">
+                        본 매치는 승리 팀(${TEAMS[match.winner] ? TEAMS[match.winner].name : match.winner})이 MVP를 수여받았습니다.
+                    </div>
+                `;
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeMatchModal() {
+            document.getElementById('matchModal').classList.add('hidden');
+        }
+
+        function renderGameSetDetail(gameIdx) {
+            if (!activeModalMatch || !activeModalMatch.games[gameIdx]) return;
+            const game = activeModalMatch.games[gameIdx];
+            const container = document.getElementById('gameDetailContent');
+
+            document.querySelectorAll('.game-set-tab').forEach((b, idx) => {
+                if (idx === gameIdx) {
+                    b.className = "game-set-tab px-3 py-1 rounded text-xs font-bold border border-amber-500 bg-amber-500 text-white shadow-2xs";
+                } else {
+                    b.className = "game-set-tab px-3 py-1 rounded text-xs font-bold border border-slate-300 bg-slate-100 text-slate-700";
+                }
+            });
+
+            const renderTeamTable = (teamData, isBlue) => `
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center text-xs font-bold ${isBlue ? 'text-sky-700' : 'text-red-700'} border-b border-slate-200 pb-1">
+                        <span>${isBlue ? '블루팀' : '레드팀'}: ${TEAMS[teamData.team] ? TEAMS[teamData.team].name : teamData.team}</span>
+                        <span class="text-[11px] text-slate-400">밴: ${teamData.bans.join(', ')}</span>
+                    </div>
+                    <div class="space-y-1.5">
+                        ${teamData.picks.map(p => `
+                            <div class="flex items-center justify-between bg-slate-50 p-2 rounded border border-slate-200 text-xs">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-7 text-[10px] font-bold text-slate-400 font-orbitron">${p.role}</span>
+                                    <span class="font-bold text-slate-900">${p.player}</span>
+                                    <span class="text-amber-700 font-medium">(${p.champ})</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="font-orbitron font-bold text-emerald-700">${p.kda}</span>
+                                    <span class="text-[11px] text-slate-500 font-orbitron">${p.gold}</span>
+                                    <span class="px-1.5 py-0.5 rounded bg-red-100 text-red-800 border border-red-200 font-orbitron font-bold text-[10px]">
+                                        ★ ${p.hupuScore}
+                                    </span>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = `
+                <div class="flex justify-between items-center text-xs bg-slate-100 p-2 rounded border border-slate-200">
+                    <span class="text-slate-600">경기 시간: <strong class="text-slate-900 font-orbitron">${game.duration}</strong></span>
+                    <span class="text-amber-700 font-bold">세트 승리: ${TEAMS[game.winner] ? TEAMS[game.winner].name : game.winner}</span>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    ${renderTeamTable(game.blue, true)}
+                    ${renderTeamTable(game.red, false)}
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
